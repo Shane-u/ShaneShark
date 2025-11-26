@@ -23,6 +23,7 @@ npm run preview    # serve build locally
 | Code Splitting | `React.lazy` + `Suspense` |
 | Animations | GSAP 3 + ScrollTrigger（`useSectionReveal`） |
 | Perf | React 18 自动批处理 + memo 友好的无状态组件 |
+| Theme Mode | `ThemeProvider` + MagicUI `AnimatedThemeToggler`（导航栏全局切换） |
 
 ```
 src/
@@ -39,7 +40,7 @@ src/
 
 | Section | Component | Notes |
 | --- | --- | --- |
-| Hero | `HeroSection` | 展示 Shane 头像（`assert/avator/avator.jpg`）、CSDN 统计、角色标签 |
+| Hero | `HeroSection` | 仅保留魔法轨道区域：中心 MagicUI `3d-card` + `AnimatedGradientText` 展示 Shane 名片，两层 `OrbitingCircles` 全环绕（头像/LOGO/技能徽章）复刻“数字游牧”式布局 |
 | Community | `SocialProofSection` | GitHub + CSDN 卡片，走马灯动画 |
 | Practice | `ExperienceSection` | ShaneShark Lab + 校园算法社经历 |
 | Skills | `SkillsSection` | 语言、前端动画、算法三组进度条 |
@@ -51,6 +52,20 @@ src/
 | Favorites | `FavoritesPage` | 动画 / 前端规范 / 算法仓库收藏 |
 
 所有区块都使用 `SectionShell` 保证一致的间距、标题结构与行动按钮，并默认套用 GSAP 动画。
+
+## Recent Updates
+
+- 2025-11-26：导航加入 MagicUI `AnimatedThemeToggler`，支持记忆 Light/Dark 主题并同步系统偏好。
+- 2025-11-26：所有 SectionShell + 卡片（Blog/Project/Skills/Books...）完成深浅色适配，按钮、渐变、背景统一响应主题。
+- 2025-11-26：Hero 名片背景改为 `#7bcde0`，保留 `#f2e0c4 / #d9b89c` 点缀，形成“海风 + 沙滩”配色。
+- 2025-11-26：Hero 名片切换至 `#f2e0c4 / #d9b89c / #a76d4d` 色系，更贴合 Shane 品牌主色。
+- 2025-11-26：按照参考样式重绘 Hero “My name is” 卡片，新增横线分隔、“I'm a” 标签与纵向身份列表。
+- 2025-11-26：Hero 名片字体与内容全部切换为白色排版，并配深蓝背景，提升对比度。
+- 2025-11-26：给 Hero 名片内的 “Shane” 文本加入 TypingAnimation 打字效果，持续强化个性化动效。
+- 2025-11-26：重构 TypingAnimation，支持类型→停顿→删除循环，Hero 中的 “Shane” 现以慢速出入场增强节奏感。
+- 2025-11-26：Hero 区块去掉 `SectionShell` 的外层文字，只保留 “My name is” 名片与双层环绕徽章，首屏更聚焦。
+- 2025-11-26：调整 Hero 名片定位，让双层轨道围绕卡片中心旋转，视觉焦点更统一。
+- 2025-11-26：修正 OrbitingCircles 轨迹中心，图标现以名片为基准环绕，避免偏移。
 
 ## Content Schema（`src/store/profile-data.ts`）
 
@@ -82,6 +97,13 @@ src/
 - CTA 统一使用描述性文字（如 “GitHub · Shane-u”）。
 - 所有外链均加 `rel="noreferrer"`，头像图片含 `alt` 文案。
 - 页面支持键盘导航，Focus 状态由 Tailwind 的边框颜色提供反馈。
+
+## Theme System
+
+- Provider：`src/providers/ThemeProvider.tsx` 负责在 `<html>` 上下发 `light/dark` class，并将用户选择持久化在 `localStorage (mysite-theme)`。
+- Hook：`useTheme()` 暴露 `theme/setTheme/toggleTheme`，在组件里获取当前模式。
+- MagicUI 控件：`src/registry/magicui/animated-theme-toggler.tsx`（导航条与移动端入口均在 `SiteHeader` 中使用）。按钮带有 `aria-pressed`、焦点高亮以及轻微光晕动画。
+- Tailwind：`tailwind.config.js` 启用了 `darkMode: 'class'`，`index.css` 增补 `html.dark` 的渐变背景与 `color-scheme`，全局可响应主题切换。`SectionShell` 及所有卡片组件都带 `dark:*` 样式，保证导航、卡片、徽章、按钮在双主题下一致。
 
 ## Future Enhancements
 

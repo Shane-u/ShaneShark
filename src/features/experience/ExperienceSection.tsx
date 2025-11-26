@@ -2,8 +2,10 @@ import { SectionShell } from '@/components/layout/SectionShell'
 import { useProfileStore } from '@/store/useProfileStore'
 
 const accentStyles = {
-  orange: 'bg-gradient-to-br from-orange-100 to-orange-50 border-orange-200',
-  slate: 'bg-gradient-to-br from-slate-900 to-slate-800 text-white border-slate-800',
+  orange:
+    'bg-gradient-to-br from-orange-100 via-white to-orange-50 border-orange-200 text-slate-900 dark:from-orange-500/20 dark:via-transparent dark:to-orange-500/5 dark:border-orange-400/60 dark:text-white',
+  slate:
+    'bg-gradient-to-br from-slate-900 to-slate-800 text-white border-slate-800 dark:from-slate-900 dark:to-slate-800 dark:border-slate-700',
 }
 
 export function ExperienceSection() {
@@ -20,7 +22,7 @@ export function ExperienceSection() {
         {experience.map((item) => (
           <article
             key={item.company}
-            className={`rounded-3xl border p-6 shadow-soft-card ${accentStyles[item.accent]}`}
+            className={`rounded-3xl border p-6 shadow-soft-card transition-colors duration-300 ${accentStyles[item.accent]}`}
           >
             <p className="text-xs uppercase tracking-[0.3em]">{item.badge}</p>
             <h3 className="mt-2 text-2xl font-semibold">{item.company}</h3>

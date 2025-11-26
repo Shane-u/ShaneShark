@@ -2,12 +2,14 @@ import defaultTheme from 'tailwindcss/defaultTheme'
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       fontFamily: {
         sans: ['"Inter"', ...defaultTheme.fontFamily.sans],
         fantasy: ['"Playfair Display"', ...defaultTheme.fontFamily.serif],
+        nav: ['"QZQNav"', ...defaultTheme.fontFamily.sans],
       },
       colors: {
         surface: '#f8fafc',

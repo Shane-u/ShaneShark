@@ -28,16 +28,16 @@ export function SectionShell({
       ref={sectionRef}
       id={id}
       className={clsx(
-        'mx-auto my-24 w-full max-w-6xl rounded-[32px] border px-6 py-12 md:px-12',
+        'mx-auto my-24 w-full max-w-6xl rounded-[32px] border px-6 py-12 transition-colors duration-300 md:px-12',
         tone === 'light'
-          ? 'bg-white/80 border-white/70 shadow-soft-card'
-          : 'bg-slate-900 text-white border-slate-800',
+          ? 'bg-white/80 text-slate-900 shadow-soft-card border-white/70 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-100'
+          : 'bg-slate-900 text-white border-slate-800 dark:bg-slate-900/90 dark:text-white',
       )}
     >
       <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           {eyebrow && (
-            <p className="text-xs uppercase tracking-[0.3em] text-accent" data-animate="text">
+            <p className="text-xs uppercase tracking-[0.3em] text-accent dark:text-amber-300" data-animate="text">
               {eyebrow}
             </p>
           )}
@@ -45,12 +45,16 @@ export function SectionShell({
             {title}
           </h2>
           {description && (
-            <p className="mt-3 max-w-2xl text-balance text-slate-500 md:text-lg" data-animate="text">
+            <p className="mt-3 max-w-2xl text-balance text-slate-500 dark:text-slate-300 md:text-lg" data-animate="text">
               {description}
             </p>
           )}
         </div>
-        {actions && <div className="flex-shrink-0" data-animate="text">{actions}</div>}
+        {actions && (
+          <div className="flex-shrink-0 text-slate-700 dark:text-slate-200" data-animate="text">
+            {actions}
+          </div>
+        )}
       </div>
       {children}
     </section>

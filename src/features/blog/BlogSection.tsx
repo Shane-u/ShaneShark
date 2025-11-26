@@ -16,7 +16,7 @@ export function BlogSection() {
           href="https://blog.csdn.net/VZS_0"
           target="_blank"
           rel="noreferrer"
-          className="rounded-full border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 hover:border-accent hover:text-accent"
+          className="rounded-full border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-accent hover:text-accent dark:border-slate-600 dark:text-slate-200"
         >
           访问 CSDN
         </a>

@@ -18,24 +18,24 @@ export function StatisticsSection() {
       description="把学习和爱好拆成可跟踪的百分比，同时记录我旅行过的城市，方便同学了解 ShaneShark 的背景。"
     >
       <div className="grid gap-6 md:grid-cols-2">
-        <article className="rounded-3xl border border-slate-100 bg-white/80 p-6 shadow-soft-card">
-          <h3 className="text-xl font-semibold text-slate-900">时间配比</h3>
-          <ul className="mt-4 space-y-3 text-sm text-slate-500">
+        <article className="rounded-3xl border border-slate-100 bg-white/80 p-6 shadow-soft-card transition-colors duration-300 dark:border-slate-700 dark:bg-slate-900/70">
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white">时间配比</h3>
+          <ul className="mt-4 space-y-3 text-sm text-slate-500 dark:text-slate-300">
             {timeSlices.map((slice) => (
               <li key={slice.label} className="flex items-center justify-between">
                 <span>{slice.label}</span>
-                <span className="font-semibold text-slate-900">{slice.value}</span>
+                <span className="font-semibold text-slate-900 dark:text-white">{slice.value}</span>
               </li>
             ))}
           </ul>
         </article>
-        <article className="rounded-3xl border border-slate-100 bg-white/80 p-6 shadow-soft-card">
-          <h3 className="text-xl font-semibold text-slate-900">足迹</h3>
+        <article className="rounded-3xl border border-slate-100 bg-white/80 p-6 shadow-soft-card transition-colors duration-300 dark:border-slate-700 dark:bg-slate-900/70">
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white">足迹</h3>
           <div className="mt-4 flex flex-wrap gap-3">
             {footprints.map((city) => (
               <span
                 key={city}
-                className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600"
+                className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition-colors duration-300 dark:border-slate-600 dark:text-slate-200"
               >
                 {city}
               </span>

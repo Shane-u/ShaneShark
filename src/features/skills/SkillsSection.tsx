@@ -16,9 +16,9 @@ export function SkillsSection() {
         {groups.map((group) => (
           <article
             key={group.id}
-            className="rounded-3xl border border-slate-100 bg-white/80 p-6 shadow-soft-card"
+            className="rounded-3xl border border-slate-100 bg-white/80 p-6 shadow-soft-card transition-colors duration-300 dark:border-slate-700 dark:bg-slate-900/70"
           >
-            <h3 className="text-lg font-semibold text-slate-900">{group.title}</h3>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{group.title}</h3>
             <div className="mt-4 space-y-4">
               {group.items.map((skill) => (
                 <SkillBar key={skill.label} label={skill.label} level={skill.level} />

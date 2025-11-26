@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useMemo } from 'react'
+import { AnimatedThemeToggler } from '@/registry/magicui/animated-theme-toggler'
 
 const navItems = [
   { label: 'Home', href: '/#home' },
@@ -20,36 +21,44 @@ export function SiteHeader() {
   )
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 backdrop-blur border-b border-white/60 bg-white/70">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-white/60 bg-white/70 backdrop-blur dark:border-white/5 dark:bg-slate-900/70">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Link to="/#home" className="font-fantasy text-2xl text-accent-dark">
+        <Link to="/#home" className="font-nav text-2xl text-accent-dark dark:text-white">
           ShaneShark
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-semibold text-slate-600 md:flex">
+        <nav className="hidden items-center gap-4 text-sm font-semibold text-slate-600 md:flex md:items-center font-nav">
           {navItems.map((item) => (
-            <a key={item.label} href={item.href} className="hover:text-accent">
+            <a
+              key={item.label}
+              href={item.href}
+              className="transition hover:text-accent dark:text-slate-200 dark:hover:text-accent"
+            >
               {item.label}
             </a>
           ))}
           <NavLink
             to="/favorites"
-            className="rounded-full border border-slate-200 px-4 py-2 text-xs uppercase tracking-wide hover:border-accent hover:text-accent"
+            className="rounded-full border border-slate-200 px-4 py-2 text-xs uppercase tracking-wide transition hover:border-accent hover:text-accent dark:border-slate-600 dark:text-slate-100"
           >
             博客收藏
           </NavLink>
+          <AnimatedThemeToggler className="ml-2" />
         </nav>
-        <div className="hidden items-center gap-3 text-xs text-slate-500 lg:flex">
+        <div className="hidden items-center gap-3 text-xs text-slate-500 lg:flex font-nav">
           {socials.map((social) => (
             <a
               key={social.label}
               href={social.href}
               target="_blank"
               rel="noreferrer"
-              className="hover:text-accent"
+              className="transition hover:text-accent dark:text-slate-300"
             >
               {social.label}
             </a>
           ))}
+        </div>
+        <div className="md:hidden">
+          <AnimatedThemeToggler ariaLabel="切换主题" />
         </div>
       </div>
     </header>
