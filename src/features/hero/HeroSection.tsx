@@ -114,7 +114,7 @@ export function HeroSection() {
     }, sectionRef)
 
     return () => ctx.revert()
-  }, [])
+  }, [sectionRef])
 
   return (
     <section

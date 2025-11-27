@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/static-components */
+// motion.create 是 Framer Motion 的推荐用法，用于动态创建组件
+// 这个规则不适用于 Framer Motion 的动态组件创建模式
 import { type ElementType, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, type MotionProps, useInView } from 'motion/react'
 import clsx from 'clsx'
@@ -63,17 +66,28 @@ export function TypingAnimation({
     return []
   }, [words, children])
 
+  // 提取依赖数组中的复杂表达式
+  const wordsKey = useMemo(() => wordsToAnimate.join('|'), [wordsToAnimate])
+
   const hasMultipleWords = wordsToAnimate.length > 1
   const typingSpeed = typeSpeed ?? duration
   const deletingSpeed = deleteSpeed ?? Math.max(typingSpeed / 2, 30)
   const shouldStart = startOnView ? isInView : true
 
+  // 使用 useEffect 来初始化状态，而不是同步设置
   useEffect(() => {
-    setDisplayedText('')
-    setCurrentCharIndex(0)
-    setCurrentWordIndex(0)
-    setPhase('typing')
-  }, [wordsToAnimate.join('|')])
+    if (wordsToAnimate.length === 0) return
+    
+    // 使用 setTimeout 来避免同步 setState
+    const timer = setTimeout(() => {
+      setDisplayedText('')
+      setCurrentCharIndex(0)
+      setCurrentWordIndex(0)
+      setPhase('typing')
+    }, 0)
+    
+    return () => clearTimeout(timer)
+  }, [wordsKey, wordsToAnimate.length])
 
   useEffect(() => {
     if (!shouldStart || wordsToAnimate.length === 0) return

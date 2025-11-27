@@ -27,6 +27,8 @@ type ThemeProviderProps = {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const manualOverrideRef = useRef(false)
+  
+  // 初始化主题，不在初始化函数中访问 ref
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window === 'undefined') {
       return 'light'
@@ -34,12 +36,21 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
     const stored = window.localStorage.getItem(STORAGE_KEY)
     if (stored === 'light' || stored === 'dark') {
-      manualOverrideRef.current = true
+      // 使用 useEffect 来设置 ref，而不是在初始化函数中
       return stored
     }
 
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   })
+
+  // 在 effect 中设置 manualOverrideRef
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const stored = window.localStorage.getItem(STORAGE_KEY)
+    if (stored === 'light' || stored === 'dark') {
+      manualOverrideRef.current = true
+    }
+  }, [])
 
   useEffect(() => {
     if (typeof document === 'undefined') return
@@ -90,6 +101,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTheme() {
   const context = useContext(ThemeContext)
   if (!context) {
