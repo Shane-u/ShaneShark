@@ -23,16 +23,6 @@ jobs:
         working-directory: backend
 
     steps:
-      - name: 配置 Docker 镜像加速器（使用阿里云）
-        run: |
-          sudo mkdir -p /etc/docker
-          sudo tee /etc/docker/daemon.json <<-'EOF'
-          {
-            "registry-mirrors": ["https://e6wr6pq8.mirror.aliyuncs.com/", "https://docker.registry.cyou/", "https://docker-cf.registry.cyou/"]
-          }
-          EOF
-          sudo systemctl daemon-reload
-          sudo systemctl restart docker
       - name: 检出代码
         uses: actions/checkout@v4
 
@@ -74,6 +64,16 @@ jobs:
       - name: 加入服务器指纹
         run: ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
         shell: bash
+      - name: 配置 Docker 镜像加速器（使用阿里云）
+        run: |
+          sudo mkdir -p /etc/docker
+          sudo tee /etc/docker/daemon.json <<-'EOF'
+          {
+            "registry-mirrors": ["https://e6wr6pq8.mirror.aliyuncs.com/", "https://docker.registry.cyou/", "https://docker-cf.registry.cyou/"]
+          }
+          EOF
+          sudo systemctl daemon-reload
+          sudo systemctl restart docker
 
       - name: 远程更新容器
         env:
