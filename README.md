@@ -1,151 +1,120 @@
-# ShaneShark · React 18 + GSAP
+# ShaneShark · Full Stack Portal
 
-ShaneShark 是 Shane 的个人门户：博客作者 / 算法练习者。整站使用 React 18、TypeScript、Zustand、Tailwind 与 GSAP，所有文字与统计数据都存放在一个数据文件中，方便随时替换个人信息。
+欢迎来到 ShaneShark。仓库里现在有 **前端 (`frontend/`) React 站点** 和 **后端 (`backend/`) Spring Boot API**。这个 README 是整份“说明书”——只要跟着它，你就能在本地启动、修改、并把新版应用部署到服务器或 GitHub Pages。
 
-## Quick Start
+---
 
-```bash
-cd /Users/shane/Documents/FrontendProject/MySite
-npm install
-npm run dev        # http://localhost:5173
-npm run build      # production bundle
-npm run preview    # serve build locally
+## 目录速览
+
+```
+ShaneShark/
+├─ frontend/        # React 18 + Vite + Tailwind + Zustand + GSAP
+├─ backend/         # Spring Boot 3 + Maven + Dockerfile
+└─ .github/workflows/
+   ├─ ci.yml                # 前后端统一 CI
+   ├─ deploy.yml            # 前端部署到 GitHub Pages
+   └─ backend-deploy.yml    # 后端 Docker 化并发布到服务器
 ```
 
-## Architecture
+---
 
-| Concern | Implementation |
+## 前端：React 18 + Vite
+
+| 项 | 说明 |
 | --- | --- |
-| Bundler | Vite 5 + React 18 + TypeScript |
-| Styling | Tailwind CSS 3（自定义字体、渐变、阴影） |
-| State | Zustand，集中托管 hero/social/experience/.../blogs |
-| Routing | React Router 7 HashRouter（`#/`、`#/favorites`，适配 GitHub Pages） |
-| Code Splitting | `React.lazy` + `Suspense` |
-| Animations | GSAP 3 + ScrollTrigger（`useSectionReveal`） |
-| Perf | React 18 自动批处理 + memo 友好的无状态组件 |
-| Theme Mode | `ThemeProvider` + MagicUI `AnimatedThemeToggler`（导航栏全局切换） |
+| 技术 | React 18、TypeScript、Vite 5、Tailwind CSS、Zustand、GSAP |
+| 启动 | `cd frontend && npm install && npm run dev`（默认 http://localhost:5173） |
+| 构建 | `npm run build`（会自动跑 `tsc -b` + `vite build`） |
+| 代码结构 | 详见 `frontend/README.md`（组件、store、动画、主题均整理完毕） |
+| 产物 | `frontend/dist` 被上传到 GitHub Pages，URL 见 workflow 输出 |
 
-```
-src/
-├─ app/router.tsx                 # route definitions + lazy pages
-├─ components/                    # shared layout + card primitives
-├─ features/                      # section-level components (hero, social, etc.)
-├─ pages/                         # routed screens
-├─ store/profile-data.ts          # single source of truth for content
-├─ store/useProfileStore.ts       # Zustand hook
-└─ types/profile.ts               # TypeScript interfaces
-```
+> 小贴士：所有个人信息都集中在 `frontend/src/store/profile-data.ts`，替换里面的文案就能改整站内容。
 
-## Section Overview
+---
 
-| Section | Component | Notes |
+## 后端：Spring Boot + Docker
+
+| 项 | 说明 |
+| --- | --- |
+| 技术 | Spring Boot 3、Maven、MySQL（见 `backend/sql/`）、Docker |
+| 启动 | `cd backend && ./mvnw spring-boot:run`（或 `mvn spring-boot:run`） |
+| 构建 | `mvn -B -ntp clean package` 会输出 `backend/target/*.jar` |
+| 镜像 | `backend/Dockerfile` 采用分层镜像，CI 会自动构建并推送 |
+| 端口 | 默认暴露 `8080`，可在 workflow `env.APP_PORT` 调整 |
+
+> 数据库脚本位于 `backend/sql/`，先执行 `create_table.sql` 再导入其他基础数据。
+
+### 后端环境变量
+
+1. 复制示例：`cp backend/.env-example backend/.env`。
+2. 打开 `backend/.env`，把数据库、邮件、AI Key 等信息填入（该文件已在 `.gitignore` 中，不会被提交）。
+3. `Spring Boot` 会通过 `spring.config.import` 自动加载同目录下的 `.env`，因此只要在本地或服务器启动前确保 `.env` 与项目根目录/运行目录同级即可。生产服务器当前固定存放在 `/root/envFiles/.env`，供 Docker 容器以 `--env-file` 方式读取。
+4. 服务器部署（systemd 例子）：
+   - 上传 `app.jar` 与 `.env` 到同一目录（如 `/opt/shaneshark`）
+   - 在 `service` 文件里加入 `EnvironmentFile=/opt/shaneshark/.env`
+   - `ExecStart=/usr/bin/java -jar /opt/shaneshark/app.jar`
+   - `sudo systemctl daemon-reload && sudo systemctl restart shaneshark`
+
+这样无论本地还是服务器都只需要维护 `.env`，就能在运行时读取敏感配置。
+
+### 验证码邮件模板
+
+- 位置：`backend/src/main/resources/templates/verification-email.html`
+- 风格：深色玻璃拟态 + Shane 个人品牌（ShaneShark 标识、个人签名）
+- 用法：模板内部包含 `{{VERIFICATION_CODE}}` 占位符，后端在渲染模板时会自动注入实际验证码
+- 自定义：如需调整色彩或文案，只需修改 CSS 变量或 `.header` / `.footer` 文本即可，无需改动后端逻辑
+
+> 该模板已经针对移动端做自适应处理，同时强化了安全提醒文案，方便你在个人博客场景下直接使用。
+
+---
+
+## CI/CD 总览
+
+| Workflow | 触发场景 | 作用 |
 | --- | --- | --- |
-| Hero | `HeroSection` | 仅保留魔法轨道区域：中心 MagicUI `3d-card` + `AnimatedGradientText` 展示 Shane 名片，两层 `OrbitingCircles` 全环绕（头像/LOGO/技能徽章）复刻“数字游牧”式布局 |
-| Community | `SocialProofSection` | GitHub + CSDN 卡片，走马灯动画 |
-| Practice | `ExperienceSection` | ShaneShark Lab + 校园算法社经历 |
-| Skills | `SkillsSection` | 语言、前端动画、算法三组进度条 |
-| Projects | `ShowcaseSection` | 项目网格（React / GSAP 实验） |
-| Video | `ShowcaseSection` | CSDN 导览短视频 |
-| Blog | `BlogSection` | 博客卡片（阅读/点赞统计 + 外链） |
-| Footprints | `StatisticsSection` | 时间配比 + 足迹（江苏/四川/浙江/重庆） |
-| Bookshelf | `BooksSection` | 书单占位卡片（“书单正在整理中”） |
-| Favorites | `FavoritesPage` | 动画 / 前端规范 / 算法仓库收藏 |
+| `ci.yml` | push / PR 到 `main` 或 `master` | 前端：`npm ci` → `eslint` → `tsc --noEmit` → `vite build`；后端：`mvn clean verify`；都会上传构建产物（`frontend-dist`、`backend-jar`） |
+| `deploy.yml` | push `frontend/**` 或手动触发 | 在 Linux Runner 里构建前端并部署到 GitHub Pages |
+| `backend-deploy.yml` | push `backend/**` 或手动触发 | 构建 Spring Boot JAR → Docker 镜像 → 推送 Docker Hub → SSH 到服务器并重启容器 |
 
-所有区块都使用 `SectionShell` 保证一致的间距、标题结构与行动按钮，并默认套用 GSAP 动画。
+### 必备 Secrets
 
-## Recent Updates
-
-- 2025-11-26：导航加入 MagicUI `AnimatedThemeToggler`，支持记忆 Light/Dark 主题并同步系统偏好。
-- 2025-11-26：所有 SectionShell + 卡片（Blog/Project/Skills/Books...）完成深浅色适配，按钮、渐变、背景统一响应主题。
-- 2025-11-26：Hero 名片背景改为 `#7bcde0`，保留 `#f2e0c4 / #d9b89c` 点缀，形成“海风 + 沙滩”配色。
-- 2025-11-26：Hero 名片切换至 `#f2e0c4 / #d9b89c / #a76d4d` 色系，更贴合 Shane 品牌主色。
-- 2025-11-26：按照参考样式重绘 Hero “My name is” 卡片，新增横线分隔、“I'm a” 标签与纵向身份列表。
-- 2025-11-26：Hero 名片字体与内容全部切换为白色排版，并配深蓝背景，提升对比度。
-- 2025-11-26：给 Hero 名片内的 “Shane” 文本加入 TypingAnimation 打字效果，持续强化个性化动效。
-- 2025-11-26：重构 TypingAnimation，支持类型→停顿→删除循环，Hero 中的 “Shane” 现以慢速出入场增强节奏感。
-- 2025-11-26：Hero 区块去掉 `SectionShell` 的外层文字，只保留 “My name is” 名片与双层环绕徽章，首屏更聚焦。
-- 2025-11-26：调整 Hero 名片定位，让双层轨道围绕卡片中心旋转，视觉焦点更统一。
-- 2025-11-26：修正 OrbitingCircles 轨迹中心，图标现以名片为基准环绕，避免偏移。
-
-## Content Schema（`src/store/profile-data.ts`）
-
-| Key | 描述 |
+| Secret | 用途 |
 | --- | --- |
-| `heroProfile` | 姓名、标语、摘要、角色、轨道徽章、CSDN 数据 |
-| `socialStats` | GitHub / CSDN 卡片（`accent` 控制渐变） |
-| `experienceHighlights` | ShaneShark Lab、校园算法社经历 |
-| `skillGroups` | “后端 & 语言 / 前端 & 动画 / 算法 & 实战” |
-| `showcases` | `category` = `project | game | video`，控制展示区域与配色 |
-| `blogs` | CSDN 博客列表（标题、摘要、标签、统计、链接） |
-| `books` | 书单占位（尚未阅读的主题也可以写在这里） |
-| `favorites` | `/favorites` 页签；记录动画/前端/算法资源 |
+| `DOCKER_HUB_USER` | Docker Hub 用户名（用于登录和拼接镜像名） |
+| `DOCKER_HUB_TOKEN` | Docker Hub Access Token |
+| `SSH_PRIVATE_KEY` | 部署服务器的私钥（建议只给出部署用账号权限） |
+| `SERVER_HOST` | 服务器公网 IP 或域名 |
+| `SERVER_USER` | SSH 登录用户（例如 `root` 或 `deploy`） |
 
-所有类型定义位于 `src/types/profile.ts`，新增字段后 TypeScript 会立即提示其它需要更新的地方。
+> 如果你希望区分测试/生产，可以在 workflow 里新增环境变量，例如 `IMAGE_TAG: ${{ github.sha }}` 并把服务器脚本更新为按 Tag 运行。
 
-> 头像：替换 `assert/avator/avator.jpg` 即可，`HeroSection` 会自动引用。
+---
 
-## Animations & Performance
+## 快速部署步骤
 
-- `src/hooks/useSectionReveal.ts`：注册 GSAP + ScrollTrigger，对每个 `SectionShell` 做进入动画，并为标题/描述/CTA 添加 stagger。
-- 懒加载：Home 页的每个区块用 `React.lazy` + `Suspense` 包裹，减少首屏体积。
-- Zustand 保持 store 极简，无副作用；配合 React 18 自动批处理。
-- Tailwind 负责响应式排版，`src/index.css` 定义背景渐变、滚动行为与 selection 颜色。
+1. **准备 Secrets**（上面列表）并在仓库 Settings → Secrets & variables → Actions 中填写。
+2. **首发前端**：Push 到 `main`（或在 Actions 里手动 Dispatch `Deploy Frontend to GitHub Pages`）。稍等片刻即可在仓库 Pages 面板看到访问地址。
+3. **首发后端**：Push `backend/**`，`Deploy Backend to Server` workflow 会自动：
+   - 用 Maven 打包 JAR
+   - 构建 Docker 镜像并推送到 Docker Hub：`${DOCKER_HUB_USER}/shaneshark-backend:latest`
+   - SSH 到服务器，拉取镜像并以 `--restart=always` 重启容器
+4. **日常更新**：正常提交并推送即可。CI 会先验证代码，通过后相应部署流程才会执行。
 
-## Accessibility Checklist
+---
 
-- `SectionShell` 输出 `section + h2 + p` 语义结构。
-- CTA 统一使用描述性文字（如 “GitHub · Shane-u”）。
-- 所有外链均加 `rel="noreferrer"`，头像图片含 `alt` 文案。
-- 页面支持键盘导航，Focus 状态由 Tailwind 的边框颜色提供反馈。
+## 常见问题
 
-## Theme System
+- **我想换服务器端口**：改 `backend-deploy.yml` 里的 `env.APP_PORT`，同时记得在服务器安全组里开放对应端口。
+- **我不想用 Docker Hub**：把 `docker/login-action` 和 `build-push-action` 参数改成 GHCR（`ghcr.io/<owner>/<image>`），Secrets 换成 `GHCR_TOKEN` 即可。
+- **前端要自定义域名**：部署完毕后，在仓库 `Settings → Pages` 中绑定 CNAME，或直接在 `frontend/public` 新增 `CNAME` 文件以便 workflow 打包。
 
-- Provider：`src/providers/ThemeProvider.tsx` 负责在 `<html>` 上下发 `light/dark` class，并将用户选择持久化在 `localStorage (mysite-theme)`。
-- Hook：`useTheme()` 暴露 `theme/setTheme/toggleTheme`，在组件里获取当前模式。
-- MagicUI 控件：`src/registry/magicui/animated-theme-toggler.tsx`（导航条与移动端入口均在 `SiteHeader` 中使用）。按钮带有 `aria-pressed`、焦点高亮以及轻微光晕动画。
-- Tailwind：`tailwind.config.js` 启用了 `darkMode: 'class'`，`index.css` 增补 `html.dark` 的渐变背景与 `color-scheme`，全局可响应主题切换。`SectionShell` 及所有卡片组件都带 `dark:*` 样式，保证导航、卡片、徽章、按钮在双主题下一致。
+---
 
-## CI/CD & Deployment
+## 下一步（建议）
 
-项目已配置 GitHub Actions 自动化工作流：
+- [ ] `frontend/src` 增加 Vitest + Testing Library，直接接入 `ci.yml`
+- [ ] 把 `backend` 部署脚本拆成服务器上的 `deploy.sh`，workflow 只需调用一个脚本，方便权限控制
+- [ ] 接入日志与性能监控（前端可用 Vercel Analytics / backend 可用 Spring Boot Actuator + Prometheus）
 
-### Workflow 文件
+祝你开发顺利！如果遇到不确定的地方，直接告诉我“哪里卡住了”，我会帮你一起补完。***
 
-- **`.github/workflows/ci.yml`** - 持续集成
-  - 代码检查（ESLint）
-  - 类型检查（TypeScript）
-  - 项目构建
-  - 上传构建产物
-
-- **`.github/workflows/deploy.yml`** - 自动部署
-  - 自动构建项目
-  - 自动部署到 GitHub Pages
-
-### 快速部署
-
-1. **首次部署**：查看 [DEPLOYMENT.md](./DEPLOYMENT.md) 获取详细步骤
-2. **日常更新**：推送代码到 `main` 分支，GitHub Actions 会自动部署
-3. **查看状态**：在仓库的 **Actions** 标签页查看运行状态
-
-### 部署流程
-
-```bash
-# 1. 修改代码
-# 2. 提交更改
-git add .
-git commit -m "更新内容"
-# 3. 推送到 GitHub（自动触发部署）
-git push origin main
-```
-
-> 📖 详细部署指南请查看 [DEPLOYMENT.md](./DEPLOYMENT.md)
-
-## Future Enhancements
-
-- [ ] CSDN 博客通过 API/JSON 自动同步到 `blogs`.
-- [ ] 加入 `SplitText` 实现逐字动画，增强英雄区标题表现力。
-- [ ] 使用 `React.SuspenseList` 让多个 `SectionShell` 动画串行过渡。
-- [ ] 增加 Vitest + Testing Library 覆盖 Blog/Favorites 组件。
-- [ ] Footprint 区块接入地图热点或 SVG 路线。
-
-> 这份 README 既是项目说明书，也是 ShaneShark 产品规划文档。替换个人信息时，只需更新 `src/store/profile-data.ts` 与头像文件即可。

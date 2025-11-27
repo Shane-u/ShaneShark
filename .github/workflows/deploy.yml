@@ -1,9 +1,12 @@
 # 部署 workflow，用于将构建好的项目部署到 GitHub Pages
-name: Deploy to GitHub Pages
+name: Deploy Frontend to GitHub Pages
 
 on:
   push:
     branches: [ "main", "master" ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 # 需要这些权限来部署到 GitHub Pages
@@ -20,6 +23,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -27,16 +33,17 @@ jobs:
       - name: 设置 Node.js 环境
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
-          cache: 'npm'
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
       - name: 安装依赖
         run: npm ci
 
       - name: 构建项目
-        run: npm run build
         env:
           GITHUB_ACTIONS: true
+        run: npm run build
 
       - name: 配置 GitHub Pages（如果未启用则自动启用）
         uses: actions/configure-pages@v4
@@ -45,7 +52,7 @@ jobs:
       - name: 上传构建产物
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: 'frontend/dist'
 
   deploy:
     environment:

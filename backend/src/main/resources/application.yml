@@ -1,0 +1,165 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: digital-college-students-backend
+  profiles:
+    active: dev
+  ai:
+    openai:
+      api-key: ${doubao.api-key}
+      base-url: ${doubao.base-url}
+      chat:
+        completions-path: /chat/completions
+        options:
+          model: ${doubao.model}
+    mcp:
+      client:
+        stdio:
+          enabled: true
+          servers-configuration: classpath:mcp/mcp-servers.json
+#  mvc:
+#    pathmatch:
+#      matching-strategy: ant_path_matcher
+  # session 配置
+  session:
+    # 30 天过期
+    timeout: 2592000
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD} # 需要在 .env 中提供
+  # 邮件配置
+  mail:
+    host: smtp.163.com
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  # Redis 配置
+#  redis:
+#    database: 1
+#    host: localhost
+#    port: 6379
+#    timeout: 5000
+#    password: 123456
+  # 文件上传
+  servlet:
+    multipart:
+      # 大小限制
+      max-file-size: -1
+      max-request-size: -1
+  # MongoDB配置
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+server:
+  address: 0.0.0.0
+  port: 8121
+  servlet:
+    context-path: /api
+    # cookie 30 天过期
+    session:
+      cookie:
+        max-age: 2592000
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: isDelete # 全局逻辑删除的实体字段名
+      logic-delete-value: 1 # 逻辑已删除值（默认为 1）
+      logic-not-delete-value: 0 # 逻辑未删除值（默认为 0）
+# 微信相关
+wx:
+  # 微信公众平台
+  mp:
+    token: ${WX_MP_TOKEN:}
+    aesKey: ${WX_MP_AES_KEY:}
+    appId: ${WX_MP_APP_ID:}
+    secret: ${WX_MP_SECRET:}
+    config-storage:
+      http-client-type: HttpClient
+      key-prefix: wx
+      redis:
+        host: 127.0.0.1
+        port: 6379
+      type: Memory
+  # 微信开放平台
+  open:
+    appId: ${WX_OPEN_APP_ID:}
+    appSecret: ${WX_OPEN_APP_SECRET:}
+# 对象存储
+# todo 需替换配置
+cos:
+  client:
+    accessKey: ${COS_ACCESS_KEY:}
+    secretKey: ${COS_SECRET_KEY:}
+    region: ${COS_REGION:}
+    bucket: ${COS_BUCKET:}
+# 爬虫配置
+crawler:
+  auto-start:
+    enabled: false # 是否自动启动爬虫，false=禁用，true=启用
+    query: "Python"  # 默认搜索关键词
+    city-code: "101270100"  # 默认城市代码（成都）
+    max-pages: 40  # 默认最大页数
+# 硅基流动 AI 配置
+silicon-flow:
+  api-key: ${SILICON_FLOW_API_KEY}
+  base-url: ${SILICON_FLOW_BASE_URL:https://api.siliconflow.cn}  # API基础URL
+  model: ${SILICON_FLOW_MODEL:Qwen/Qwen3-30B-A3B-Instruct-2507}  # 默认模型
+  timeout: ${SILICON_FLOW_TIMEOUT:30000}  # 请求超时时间（毫秒）
+# 接口文档配置
+knife4j:
+  enable: true
+  openapi:
+    title: "接口文档"
+    version: 1.0
+    group:
+      default:
+        api-rule: package
+        api-rule-resources:
+          - com.digital
+# Minio核⼼配置
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://47.109.65.166:9002} # 服务地址
+  access-key: ${MINIO_ACCESS_KEY:}
+  secret-key: ${MINIO_SECRET_KEY:}
+  bucket-name: ${MINIO_BUCKET_NAME:digital} # 存储桶名
+  # 清理规则配置
+  clean:
+    enabled: true # 是否开启清理任务
+    cron: 0 0 2 * * ? # 执⾏时间（每天凌晨2点，Cron表达式）
+    expire-days: 30 # 过期天数（超过30天的⽂件清理）
+    ignore-prefixes: test_,temp_ # 忽略前缀（这些⽂件不清理，多前缀⽤逗号分隔）
+    max-batch-size: 100 # 批量删除数量（避免Minio压⼒过⼤）
+# 火山引擎Doubao配置
+doubao:
+  api-key: ${DOUBAO_API_KEY}
+  base-url: ${DOUBAO_BASE_URL:https://ark.cn-beijing.volces.com/api/v3}
+  model: ${DOUBAO_MODEL:doubao-1-5-lite-32k-250115}
+  timeout: ${DOUBAO_TIMEOUT:60000} # 请求超时时间（毫秒）
+
+# 火山引擎DeepSeek配置
+deepseek:
+  api-key: ${DEEPSEEK_API_KEY}
+  base-url: ${DEEPSEEK_BASE_URL:https://ark.cn-beijing.volces.com/api/v3}
+  model: ${DEEPSEEK_MODEL:deepseek-v3-1-terminus}
+  timeout: ${DEEPSEEK_TIMEOUT:60000} # 请求超时时间（毫秒）
+
+# 火山引擎Kimi配置
+kimi:
+  api-key: ${KIMI_API_KEY}
+  base-url: ${KIMI_BASE_URL:https://ark.cn-beijing.volces.com/api/v3}
+  model: ${KIMI_MODEL:kimi-k2-250905}
+  timeout: ${KIMI_TIMEOUT:60000} # 请求超时时间（毫秒）
