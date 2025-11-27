@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShaneShark · 验证码</title>
+    <style>
+        :root {
+            --bg: #030712;
+            --card: rgba(15, 23, 42, 0.92);
+            --accent: #38bdf8;
+            --accent-strong: #0ea5e9;
+            --muted: #94a3b8;
+            --text: #e2e8f0;
+            --border: rgba(56, 189, 248, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: radial-gradient(circle at top, rgba(56, 189, 248, 0.15), transparent 55%), var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 32px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .email-container {
+            width: 100%;
+            max-width: 560px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            box-shadow: 0 25px 80px rgba(2, 6, 23, 0.55);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .email-container::after {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: 24px;
+            border: 1px solid rgba(226, 232, 240, 0.08);
+            pointer-events: none;
+        }
+
+        .header {
+            padding: 48px 40px 20px;
+        }
+
+        .brand {
+            font-size: 14px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .title-row {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .title span {
+            color: var(--accent);
+        }
+
+        .tagline {
+            font-size: 16px;
+            color: var(--muted);
+        }
+
+        .content {
+            padding: 0 40px 32px;
+        }
+
+        .greeting {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .message {
+            font-size: 15px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .code-pill {
+            margin: 32px auto;
+            width: 100%;
+            max-width: 320px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--accent);
+            border-radius: 24px;
+            padding: 18px 24px;
+            letter-spacing: 10px;
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--accent);
+            box-shadow: inset 0 0 30px rgba(14, 165, 233, 0.15);
+            position: relative;
+        }
+
+        .code-pill::before {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: 22px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .list-card {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 18px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+
+        .list-card strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .list-card ul {
+            list-style: none;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .list-card li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 0;
+        }
+
+        .list-card li::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--accent);
+            display: inline-block;
+        }
+
+        .footer {
+            padding: 28px 40px 40px;
+            border-top: 1px solid rgba(148, 163, 184, 0.15);
+            text-align: left;
+        }
+
+        .signature {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .signature span {
+            color: var(--accent-strong);
+        }
+
+        .footer-meta {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 540px) {
+            .email-container {
+                border-radius: 20px;
+            }
+
+            .header,
+            .content,
+            .footer {
+                padding: 32px 24px;
+            }
+
+            .code-pill {
+                letter-spacing: 8px;
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <!-- Header -->
+    <div class="header">
+        <div class="brand">ShaneShark</div>
+        <div class="title-row">
+            <div class="title">验证码 · <span>Shane</span></div>
+            <div class="tagline">私域博客安全验证</div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="greeting">你好，朋友！</div>
+        <p class="message">
+            你正在尝试登录或操作 <strong>Shane</strong> 的个人博客，这是一封一次性验证码通知。
+            出于安全考虑，请在 10 分钟内输入下面的验证码完成操作。
+        </p>
+
+        <div class="code-pill">{{VERIFICATION_CODE}}</div>
+
+        <div class="list-card">
+            <strong>安全提醒</strong>
+            <ul>
+                <li>验证码仅供当前操作使用，勿向任何人泄露</li>
+                <li>若非你本人操作，请立即忽略并删除此邮件</li>
+                <li>如遇到异常，可随时回复邮件联系 Shane</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="signature">保持灵感，继续创作 — <span>Shane</span></div>
+        <div class="footer-meta">
+            ShaneShark · Personal Blog<br>
+            这封信由系统自动发送，请勿直接回复
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
