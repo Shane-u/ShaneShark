@@ -69,7 +69,9 @@ jobs:
           sudo mkdir -p /etc/docker
           sudo tee /etc/docker/daemon.json <<-'EOF'
           {
-            "registry-mirrors": ["https://e6wr6pq8.mirror.aliyuncs.com/", "https://docker.registry.cyou/", "https://docker-cf.registry.cyou/"]
+            "registry-mirrors": ["https://e6wr6pq8.mirror.aliyuncs.com/", "https://docker.registry.cyou/", "https://docker-cf.registry.cyou/"],
+            "dns": ["114.114.114.114","8.8.8.8"],
+            "proxies": {"http-proxy": "http://127.0.0.1:7890","https-proxy": "http://127.0.0.1:7890"}
           }
           EOF
           sudo systemctl daemon-reload
