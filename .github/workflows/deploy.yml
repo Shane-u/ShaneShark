@@ -38,6 +38,10 @@ jobs:
         env:
           GITHUB_ACTIONS: true
 
+      - name: 配置 GitHub Pages（如果未启用则自动启用）
+        uses: actions/configure-pages@v4
+        continue-on-error: true
+
       - name: 上传构建产物
         uses: actions/upload-pages-artifact@v3
         with:
@@ -50,6 +54,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: 检查 GitHub Pages 状态
+        run: |
+          echo "⚠️ 如果部署失败，请确保已在 GitHub 仓库设置中启用 Pages"
+          echo "📝 访问: https://github.com/${{ github.repository }}/settings/pages"
+          echo "✅ 在 Source 中选择 'GitHub Actions' 作为部署源"
+
       - name: 部署到 GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

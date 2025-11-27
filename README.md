@@ -19,7 +19,7 @@ npm run preview    # serve build locally
 | Bundler | Vite 5 + React 18 + TypeScript |
 | Styling | Tailwind CSS 3（自定义字体、渐变、阴影） |
 | State | Zustand，集中托管 hero/social/experience/.../blogs |
-| Routing | React Router 7（`/`、`/favorites`） |
+| Routing | React Router 7 HashRouter（`#/`、`#/favorites`，适配 GitHub Pages） |
 | Code Splitting | `React.lazy` + `Suspense` |
 | Animations | GSAP 3 + ScrollTrigger（`useSectionReveal`） |
 | Perf | React 18 自动批处理 + memo 友好的无状态组件 |
