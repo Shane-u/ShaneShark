@@ -6,10 +6,13 @@ on:
     branches: [ "main", "master" ]
   workflow_dispatch:
 
+# 需要这些权限来部署到 GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
+
+# 确保同一时间只有一个部署任务运行
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -32,9 +35,8 @@ jobs:
 
       - name: 构建项目
         run: npm run build
-
-      - name: 设置 Pages
-        uses: actions/configure-pages@v4
+        env:
+          GITHUB_ACTIONS: true
 
       - name: 上传构建产物
         uses: actions/upload-pages-artifact@v3
