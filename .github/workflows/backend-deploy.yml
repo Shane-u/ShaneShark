@@ -13,7 +13,7 @@ env:
   IMAGE_TAG: latest
   CONTAINER_NAME: shaneshark-backend
   APP_PORT: 8121
-  DOCKER_PROXY_PREFIX: dockerproxy.com/
+  DOCKER_PROXY_PREFIX: registry.cn-hangzhou.aliyuncs.com/
 
 jobs:
   build-and-deploy:
@@ -23,6 +23,16 @@ jobs:
         working-directory: backend
 
     steps:
+      - name: 配置 Docker 镜像加速器（使用阿里云）
+        run: |
+          sudo mkdir -p /etc/docker
+          sudo tee /etc/docker/daemon.json <<-'EOF'
+          {
+            "registry-mirrors": ["https://e6wr6pq8.mirror.aliyuncs.com/", "https://docker.registry.cyou/", "https://docker-cf.registry.cyou/"]
+          }
+          EOF
+          sudo systemctl daemon-reload
+          sudo systemctl restart docker
       - name: 检出代码
         uses: actions/checkout@v4
 
