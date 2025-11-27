@@ -80,10 +80,10 @@ export function TypingAnimation({
     
     // 使用 setTimeout 来避免同步 setState
     const timer = setTimeout(() => {
-      setDisplayedText('')
-      setCurrentCharIndex(0)
-      setCurrentWordIndex(0)
-      setPhase('typing')
+    setDisplayedText('')
+    setCurrentCharIndex(0)
+    setCurrentWordIndex(0)
+    setPhase('typing')
     }, 0)
     
     return () => clearTimeout(timer)
