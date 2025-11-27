@@ -69,7 +69,7 @@ jobs:
           SSH_TARGET: ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}
           DOCKER_IMAGE: ${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
         run: |
-          ssh "$SSH_TARGET" <<'EOF'
+          ssh "$SSH_TARGET" <<EOF
             set -e
             docker pull $DOCKER_IMAGE
             docker stop ${{ env.CONTAINER_NAME }} || true
