@@ -105,6 +105,41 @@ src/
 - MagicUI 控件：`src/registry/magicui/animated-theme-toggler.tsx`（导航条与移动端入口均在 `SiteHeader` 中使用）。按钮带有 `aria-pressed`、焦点高亮以及轻微光晕动画。
 - Tailwind：`tailwind.config.js` 启用了 `darkMode: 'class'`，`index.css` 增补 `html.dark` 的渐变背景与 `color-scheme`，全局可响应主题切换。`SectionShell` 及所有卡片组件都带 `dark:*` 样式，保证导航、卡片、徽章、按钮在双主题下一致。
 
+## CI/CD & Deployment
+
+项目已配置 GitHub Actions 自动化工作流：
+
+### Workflow 文件
+
+- **`.github/workflows/ci.yml`** - 持续集成
+  - 代码检查（ESLint）
+  - 类型检查（TypeScript）
+  - 项目构建
+  - 上传构建产物
+
+- **`.github/workflows/deploy.yml`** - 自动部署
+  - 自动构建项目
+  - 自动部署到 GitHub Pages
+
+### 快速部署
+
+1. **首次部署**：查看 [DEPLOYMENT.md](./DEPLOYMENT.md) 获取详细步骤
+2. **日常更新**：推送代码到 `main` 分支，GitHub Actions 会自动部署
+3. **查看状态**：在仓库的 **Actions** 标签页查看运行状态
+
+### 部署流程
+
+```bash
+# 1. 修改代码
+# 2. 提交更改
+git add .
+git commit -m "更新内容"
+# 3. 推送到 GitHub（自动触发部署）
+git push origin main
+```
+
+> 📖 详细部署指南请查看 [DEPLOYMENT.md](./DEPLOYMENT.md)
+
 ## Future Enhancements
 
 - [ ] CSDN 博客通过 API/JSON 自动同步到 `blogs`.
