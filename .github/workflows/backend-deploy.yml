@@ -13,6 +13,7 @@ env:
   IMAGE_TAG: latest
   CONTAINER_NAME: shaneshark-backend
   APP_PORT: 8121
+  DOCKER_PROXY_PREFIX: dockerproxy.com/
 
 jobs:
   build-and-deploy:
@@ -68,10 +69,16 @@ jobs:
         env:
           SSH_TARGET: ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}
           DOCKER_IMAGE: ${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          DOCKER_PROXY_IMAGE: ${{ env.DOCKER_PROXY_PREFIX }}${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
         run: |
           ssh "$SSH_TARGET" <<EOF
             set -e
-            docker pull $DOCKER_IMAGE
+            if ! docker pull $DOCKER_IMAGE; then
+              echo "Primary registry pull failed, trying proxy $DOCKER_PROXY_IMAGE"
+              docker pull $DOCKER_PROXY_IMAGE
+              docker tag $DOCKER_PROXY_IMAGE $DOCKER_IMAGE
+              docker rmi $DOCKER_PROXY_IMAGE || true
+            fi
             docker stop ${{ env.CONTAINER_NAME }} || true
             docker rm ${{ env.CONTAINER_NAME }} || true
             docker run -d \
