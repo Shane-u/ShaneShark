@@ -1,6 +1,6 @@
 # ShaneShark · React 18 + GSAP
 
-ShaneShark 是 Shane 的个人门户：初中生 / 博客作者 / 算法练习者。整站使用 React 18、TypeScript、Zustand、Tailwind 与 GSAP，所有文字与统计数据都存放在一个数据文件中，方便随时替换个人信息。
+ShaneShark 是 Shane 的个人门户：博客作者 / 算法练习者。整站使用 React 18、TypeScript、Zustand、Tailwind 与 GSAP，所有文字与统计数据都存放在一个数据文件中，方便随时替换个人信息。
 
 ## Quick Start
 
