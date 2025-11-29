@@ -41,8 +41,141 @@ ShaneShark/
 | 构建 | `mvn -B -ntp clean package` 会输出 `backend/target/*.jar` |
 | 部署 | CI 会自动构建 JAR 并通过 SCP 传输到服务器，使用 systemd 服务管理 |
 | 端口 | 默认 `8121`，可在 workflow `env.APP_PORT` 调整 |
+| API 路径 | `/api`（完整 URL: `http://服务器地址:8121/api`） |
+| 接口文档 | 部署后访问 `http://服务器地址:8121/api/doc.html`（Knife4j） |
 
 > 数据库脚本位于 `backend/sql/`，先执行 `create_table.sql` 再导入其他基础数据。
+
+### 测试后端服务
+
+部署完成后，可以使用以下方法测试服务是否正常：
+
+#### 方法 1: 使用测试脚本（推荐）
+
+```bash
+# 在项目根目录执行
+./test-backend.sh http://你的服务器地址:8121
+
+# 或者测试本地服务
+./test-backend.sh http://localhost:8121
+```
+
+测试脚本会自动测试多个接口，包括：
+- 服务连接测试
+- 获取验证码接口
+- MCP 调试工具接口
+- 用户列表接口
+- 文章列表接口
+- 其他基础接口
+
+#### 方法 2: 使用 curl 命令快速测试
+
+```bash
+# 1. 测试服务是否可达
+curl http://你的服务器地址:8121/api/user/captcha
+
+# 2. 测试获取验证码（最简单，不需要登录）
+curl -X GET "http://你的服务器地址:8121/api/user/captcha"
+
+# 3. 测试用户列表接口
+curl -X POST "http://你的服务器地址:8121/api/user/list/page/vo" \
+  -H "Content-Type: application/json" \
+  -d '{"current":1,"pageSize":10}'
+
+# 4. 测试文章列表接口
+curl -X POST "http://你的服务器地址:8121/api/post/list/page/vo" \
+  -H "Content-Type: application/json" \
+  -d '{"current":1,"pageSize":10}'
+```
+
+#### 方法 3: 访问接口文档
+
+部署后访问 Knife4j 接口文档：
+```
+http://你的服务器地址:8121/api/doc.html
+```
+
+在文档中可以：
+- 查看所有可用接口
+- 在线测试接口
+- 查看请求/响应示例
+
+#### 方法 4: 检查服务状态（在服务器上）
+
+**使用检查脚本（推荐）:**
+
+```bash
+# 1. 将 check-server.sh 上传到服务器，或直接在服务器上创建
+# 2. SSH 到服务器后执行
+chmod +x check-server.sh
+./check-server.sh
+```
+
+脚本会自动检查：
+- systemd 服务状态
+- JAR 文件是否存在
+- 端口是否监听
+- Java 进程是否运行
+- 环境变量文件
+- 服务日志
+- 防火墙状态
+- 本地连接测试
+
+**手动检查命令:**
+
+```bash
+# SSH 到服务器后执行
+
+# 1. 检查 systemd 服务状态
+sudo systemctl status shaneshark-backend
+
+# 2. 查看服务日志（实时）
+sudo journalctl -u shaneshark-backend -f
+
+# 3. 查看最近日志
+sudo journalctl -u shaneshark-backend -n 50 --no-pager
+
+# 4. 检查端口是否监听
+sudo netstat -tlnp | grep 8121
+# 或
+sudo ss -tlnp | grep 8121
+
+# 5. 检查 Java 进程
+ps aux | grep java
+
+# 6. 检查 JAR 文件
+ls -lh /root/project/shaneshark_backend/app.jar
+
+# 7. 测试本地连接
+curl http://localhost:8121/api/user/captcha
+
+# 8. 重启服务（如果需要）
+sudo systemctl restart shaneshark-backend
+sudo systemctl status shaneshark-backend
+```
+
+#### 常见问题排查
+
+如果测试失败，检查以下几点：
+
+1. **服务未启动**
+   ```bash
+   sudo systemctl start shaneshark-backend
+   sudo systemctl status shaneshark-backend
+   ```
+
+2. **端口未开放**
+   - 检查服务器防火墙是否开放 8121 端口
+   - 检查云服务器安全组规则
+
+3. **数据库连接失败**
+   - 检查 `/root/envFiles/.env` 中的数据库配置
+   - 确认数据库服务正在运行
+
+4. **查看详细日志**
+   ```bash
+   sudo journalctl -u shaneshark-backend -n 100 --no-pager
+   ```
 
 ### 后端环境变量
 
@@ -50,7 +183,7 @@ ShaneShark/
 2. 打开 `backend/.env`，把数据库、邮件、AI Key 等信息填入（该文件已在 `.gitignore` 中，不会被提交）。
 3. `Spring Boot` 会通过 `spring.config.import` 自动加载同目录下的 `.env`，因此只要在本地或服务器启动前确保 `.env` 与项目根目录/运行目录同级即可。生产服务器当前固定存放在 `/root/envFiles/.env`，供 systemd 服务以 `EnvironmentFile` 方式读取。
 4. 服务器部署（自动完成）：
-   - CI 会自动将 JAR 文件传输到 `/opt/shaneshark/app.jar`
+   - CI 会自动将 JAR 文件传输到 `/root/project/shaneshark_backend/app.jar`
    - 自动创建 systemd 服务文件 `/etc/systemd/system/shaneshark-backend.service`
    - 服务会自动读取 `/root/envFiles/.env` 环境变量文件
    - 服务会自动启动并设置为开机自启
