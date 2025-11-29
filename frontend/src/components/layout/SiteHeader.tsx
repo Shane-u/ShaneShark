@@ -1,18 +1,20 @@
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
 import { AnimatedThemeToggler } from '@/registry/magicui/animated-theme-toggler'
 import { NavBrand } from './NavBrand'
 
 const navItems = [
-  { label: 'Home', href: '/#home' },
-  { label: 'Projects', href: '/#projects' },
-  { label: 'Skills', href: '/#skills' },
-  { label: 'Blog', href: '/#blog' },
-  { label: 'Footprints', href: '/#footprint' },
-  { label: 'Books', href: '/#books' },
+  { label: 'Home', anchor: 'home' },
+  { label: 'Projects', anchor: 'projects' },
+  { label: 'Skills', anchor: 'skills' },
+  { label: 'Blog', anchor: 'blog' },
+  { label: 'Footprints', anchor: 'footprint' },
+  { label: 'Books', anchor: 'books' },
 ]
 
 export function SiteHeader() {
+  const navigate = useNavigate()
+  const location = useLocation()
   const socials = useMemo(
     () => [
       { label: 'GitHub', href: 'https://github.com/Shane-u' },
@@ -21,17 +23,55 @@ export function SiteHeader() {
     [],
   )
 
+  // 处理锚点跳转
+  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, anchor: string) => {
+    e.preventDefault()
+    
+    // 如果不在首页，先跳转到首页
+    if (location.pathname !== '/') {
+      navigate(`/${anchor}`)
+      return
+    }
+
+    // 在首页时，滚动到对应的锚点
+    setTimeout(() => {
+      const element = document.getElementById(anchor)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 0)
+    
+    // 更新 URL
+    navigate(`/${anchor}`, { replace: true })
+  }
+
+  const handleBrandClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    navigate('/home')
+    setTimeout(() => {
+      const element = document.getElementById('home')
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 0)
+  }
+
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-white/60 bg-white/70 backdrop-blur dark:border-white/5 dark:bg-slate-900/70">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Link to="/#home" className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900 rounded-full">
+        <Link 
+          to="/" 
+          onClick={handleBrandClick}
+          className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900 rounded-full"
+        >
           <NavBrand />
         </Link>
         <nav className="hidden items-center gap-4 text-sm font-semibold text-slate-600 md:flex md:items-center font-nav">
           {navItems.map((item) => (
             <a
               key={item.label}
-              href={item.href}
+              href={`#${item.anchor}`}
+              onClick={(e) => handleAnchorClick(e, item.anchor)}
               className="transition hover:text-accent dark:text-slate-200 dark:hover:text-accent"
             >
               {item.label}

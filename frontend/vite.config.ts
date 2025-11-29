@@ -11,4 +11,9 @@ export default defineConfig({
     },
   },
   base: process.env.GITHUB_ACTIONS ? '/ShaneShark/' : '/',
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true
+  },
 })
