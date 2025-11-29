@@ -16,7 +16,7 @@ spring:
     mcp:
       client:
         stdio:
-          enabled: false  # 禁用 MCP 客户端（服务器上可能没有 uvx 命令）
+          enabled: false  # 禁用 MCP 客户端
           servers-configuration: classpath:mcp/mcp-servers.json
 #  mvc:
 #    pathmatch:
