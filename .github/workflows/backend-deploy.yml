@@ -9,11 +9,10 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_NAME: shaneshark-backend
-  IMAGE_TAG: latest
-  CONTAINER_NAME: shaneshark-backend
+  APP_NAME: shaneshark-backend
   APP_PORT: 8121
-  DOCKER_PROXY_PREFIX: registry.cn-hangzhou.aliyuncs.com/
+  DEPLOY_PATH: /opt/shaneshark
+  JAR_NAME: shaneShark-0.0.1-SNAPSHOT.jar
 
 jobs:
   build-and-deploy:
@@ -36,26 +35,6 @@ jobs:
       - name: Maven 构建（包含测试）
         run: mvn -B -ntp clean package
 
-      - name: 准备 Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: 登录 Docker Registry
-        uses: docker/login-action@v3
-        with:
-          registry: docker.io
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
-      - name: 构建并推送镜像
-        uses: docker/build-push-action@v5
-        with:
-          context: backend
-          file: backend/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          build-args: |
-            JAR_FILE=target/*.jar
-
       - name: 配置 SSH 凭据
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -64,40 +43,87 @@ jobs:
       - name: 加入服务器指纹
         run: ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
         shell: bash
-      - name: 配置 Docker 镜像加速器（使用阿里云）
-        run: |
-          sudo mkdir -p /etc/docker
-          sudo tee /etc/docker/daemon.json <<-'EOF'
-          {
-            "registry-mirrors": ["https://e6wr6pq8.mirror.aliyuncs.com/", "https://docker.registry.cyou/", "https://docker-cf.registry.cyou/"],
-            "dns": ["114.114.114.114","8.8.8.8"],
-            "proxies": {"http-proxy": "http://127.0.0.1:7890","https-proxy": "http://127.0.0.1:7890"}
-          }
-          EOF
-          sudo systemctl daemon-reload
-          sudo systemctl restart docker
 
-      - name: 远程更新容器
+      - name: 传输 JAR 文件到服务器
         env:
           SSH_TARGET: ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}
-          DOCKER_IMAGE: ${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          DOCKER_PROXY_IMAGE: ${{ env.DOCKER_PROXY_PREFIX }}${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
         run: |
-          ssh "$SSH_TARGET" <<EOF
+          scp backend/target/${{ env.JAR_NAME }} "$SSH_TARGET:${{ env.DEPLOY_PATH }}/app.jar"
+
+      - name: 远程部署应用
+        env:
+          SSH_TARGET: ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}
+          APP_NAME: ${{ env.APP_NAME }}
+          DEPLOY_PATH: ${{ env.DEPLOY_PATH }}
+          APP_PORT: ${{ env.APP_PORT }}
+        run: |
+          ssh "$SSH_TARGET" bash -s << 'REMOTE_SCRIPT'
             set -e
-            if ! docker pull $DOCKER_IMAGE; then
-              echo "Primary registry pull failed, trying proxy $DOCKER_PROXY_IMAGE"
-              docker pull $DOCKER_PROXY_IMAGE
-              docker tag $DOCKER_PROXY_IMAGE $DOCKER_IMAGE
-              docker rmi $DOCKER_PROXY_IMAGE || true
+            APP_NAME="${{ env.APP_NAME }}"
+            DEPLOY_PATH="${{ env.DEPLOY_PATH }}"
+            
+            # 确保部署目录存在
+            mkdir -p "$DEPLOY_PATH"
+            
+            # 停止旧进程（如果存在）
+            if systemctl is-active --quiet "$APP_NAME" 2>/dev/null; then
+              echo "停止 systemd 服务..."
+              systemctl stop "$APP_NAME" || true
             fi
-            docker stop ${{ env.CONTAINER_NAME }} || true
-            docker rm ${{ env.CONTAINER_NAME }} || true
-            docker run -d \
-              --name ${{ env.CONTAINER_NAME }} \
-              --restart=always \
-              -p ${{ env.APP_PORT }}:${{ env.APP_PORT }} \
-              --env-file /root/envFiles/.env \
-              $DOCKER_IMAGE
-          EOF
+            
+            # 查找并停止可能正在运行的 Java 进程
+            OLD_PID=$(pgrep -f "java.*app.jar" || true)
+            if [ ! -z "$OLD_PID" ]; then
+              echo "停止旧进程 PID: $OLD_PID"
+              kill -15 "$OLD_PID" || true
+              sleep 2
+              if kill -0 "$OLD_PID" 2>/dev/null; then
+                kill -9 "$OLD_PID" || true
+              fi
+            fi
+            
+            # 检查 systemd 服务文件是否存在，不存在则创建
+            SERVICE_FILE="/etc/systemd/system/${APP_NAME}.service"
+            if [ ! -f "$SERVICE_FILE" ]; then
+              echo "创建 systemd 服务文件..."
+              sudo tee "$SERVICE_FILE" > /dev/null <<EOF
+[Unit]
+Description=ShaneShark Backend Application
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=$DEPLOY_PATH
+EnvironmentFile=/root/envFiles/.env
+ExecStart=/usr/bin/java -jar $DEPLOY_PATH/app.jar
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+              systemctl daemon-reload
+              systemctl enable "$APP_NAME"
+            fi
+            
+            # 启动服务
+            echo "启动应用服务..."
+            systemctl start "$APP_NAME"
+            
+            # 等待服务启动
+            sleep 3
+            
+            # 检查服务状态
+            if systemctl is-active --quiet "$APP_NAME"; then
+              echo "应用启动成功！"
+              systemctl status "$APP_NAME" --no-pager -l
+            else
+              echo "应用启动失败，查看日志："
+              journalctl -u "$APP_NAME" -n 50 --no-pager
+              exit 1
+            fi
+          REMOTE_SCRIPT
 

@@ -32,15 +32,15 @@ ShaneShark/
 
 ---
 
-## 后端：Spring Boot + Docker
+## 后端：Spring Boot
 
 | 项 | 说明 |
 | --- | --- |
-| 技术 | Spring Boot 3、Maven、MySQL（见 `backend/sql/`）、Docker |
+| 技术 | Spring Boot 3、Maven、MySQL（见 `backend/sql/`） |
 | 启动 | `cd backend && ./mvnw spring-boot:run`（或 `mvn spring-boot:run`） |
 | 构建 | `mvn -B -ntp clean package` 会输出 `backend/target/*.jar` |
-| 镜像 | `backend/Dockerfile` 采用分层镜像，CI 会自动构建并推送 |
-| 端口 | 默认暴露 `8080`，可在 workflow `env.APP_PORT` 调整 |
+| 部署 | CI 会自动构建 JAR 并通过 SCP 传输到服务器，使用 systemd 服务管理 |
+| 端口 | 默认 `8121`，可在 workflow `env.APP_PORT` 调整 |
 
 > 数据库脚本位于 `backend/sql/`，先执行 `create_table.sql` 再导入其他基础数据。
 
@@ -48,12 +48,12 @@ ShaneShark/
 
 1. 复制示例：`cp backend/.env-example backend/.env`。
 2. 打开 `backend/.env`，把数据库、邮件、AI Key 等信息填入（该文件已在 `.gitignore` 中，不会被提交）。
-3. `Spring Boot` 会通过 `spring.config.import` 自动加载同目录下的 `.env`，因此只要在本地或服务器启动前确保 `.env` 与项目根目录/运行目录同级即可。生产服务器当前固定存放在 `/root/envFiles/.env`，供 Docker 容器以 `--env-file` 方式读取。
-4. 服务器部署（systemd 例子）：
-   - 上传 `app.jar` 与 `.env` 到同一目录（如 `/opt/shaneshark`）
-   - 在 `service` 文件里加入 `EnvironmentFile=/opt/shaneshark/.env`
-   - `ExecStart=/usr/bin/java -jar /opt/shaneshark/app.jar`
-   - `sudo systemctl daemon-reload && sudo systemctl restart shaneshark`
+3. `Spring Boot` 会通过 `spring.config.import` 自动加载同目录下的 `.env`，因此只要在本地或服务器启动前确保 `.env` 与项目根目录/运行目录同级即可。生产服务器当前固定存放在 `/root/envFiles/.env`，供 systemd 服务以 `EnvironmentFile` 方式读取。
+4. 服务器部署（自动完成）：
+   - CI 会自动将 JAR 文件传输到 `/opt/shaneshark/app.jar`
+   - 自动创建 systemd 服务文件 `/etc/systemd/system/shaneshark-backend.service`
+   - 服务会自动读取 `/root/envFiles/.env` 环境变量文件
+   - 服务会自动启动并设置为开机自启
 
 这样无论本地还是服务器都只需要维护 `.env`，就能在运行时读取敏感配置。
 
@@ -74,19 +74,17 @@ ShaneShark/
 | --- | --- | --- |
 | `ci.yml` | push / PR 到 `main` 或 `master` | 前端：`npm ci` → `eslint` → `tsc --noEmit` → `vite build`；后端：`mvn clean verify`；都会上传构建产物（`frontend-dist`、`backend-jar`） |
 | `deploy.yml` | push `frontend/**` 或手动触发 | 在 Linux Runner 里构建前端并部署到 GitHub Pages |
-| `backend-deploy.yml` | push `backend/**` 或手动触发 | 构建 Spring Boot JAR → Docker 镜像 → 推送 Docker Hub → SSH 到服务器并重启容器 |
+| `backend-deploy.yml` | push `backend/**` 或手动触发 | 构建 Spring Boot JAR → SCP 传输到服务器 → 使用 systemd 服务管理并重启应用 |
 
 ### 必备 Secrets
 
 | Secret | 用途 |
 | --- | --- |
-| `DOCKER_HUB_USER` | Docker Hub 用户名（用于登录和拼接镜像名） |
-| `DOCKER_HUB_TOKEN` | Docker Hub Access Token |
 | `SSH_PRIVATE_KEY` | 部署服务器的私钥（建议只给出部署用账号权限） |
 | `SERVER_HOST` | 服务器公网 IP 或域名 |
 | `SERVER_USER` | SSH 登录用户（例如 `root` 或 `deploy`） |
 
-> 如果你希望区分测试/生产，可以在 workflow 里新增环境变量，例如 `IMAGE_TAG: ${{ github.sha }}` 并把服务器脚本更新为按 Tag 运行。
+> **注意**：服务器需要安装 Java 17 和 systemd。部署脚本会自动创建 systemd 服务文件，应用会以服务形式运行，支持自动重启。
 
 ---
 
@@ -96,16 +94,17 @@ ShaneShark/
 2. **首发前端**：Push 到 `main`（或在 Actions 里手动 Dispatch `Deploy Frontend to GitHub Pages`）。稍等片刻即可在仓库 Pages 面板看到访问地址。
 3. **首发后端**：Push `backend/**`，`Deploy Backend to Server` workflow 会自动：
    - 用 Maven 打包 JAR
-   - 构建 Docker 镜像并推送到 Docker Hub：`${DOCKER_HUB_USER}/shaneshark-backend:latest`
-   - SSH 到服务器，拉取镜像并以 `--restart=always` 重启容器
+   - 通过 SCP 将 JAR 文件传输到服务器的 `/opt/shaneshark/app.jar`
+   - SSH 到服务器，停止旧进程，创建/更新 systemd 服务，并启动应用
 4. **日常更新**：正常提交并推送即可。CI 会先验证代码，通过后相应部署流程才会执行。
 
 ---
 
 ## 常见问题
 
-- **我想换服务器端口**：改 `backend-deploy.yml` 里的 `env.APP_PORT`，同时记得在服务器安全组里开放对应端口。
-- **我不想用 Docker Hub**：把 `docker/login-action` 和 `build-push-action` 参数改成 GHCR（`ghcr.io/<owner>/<image>`），Secrets 换成 `GHCR_TOKEN` 即可。
+- **我想换服务器端口**：改 `backend-deploy.yml` 里的 `env.APP_PORT`，同时记得在服务器安全组里开放对应端口，并更新 `application.yml` 中的 `server.port`。
+- **查看应用日志**：在服务器上执行 `journalctl -u shaneshark-backend -f` 查看实时日志，或 `journalctl -u shaneshark-backend -n 100` 查看最近 100 条日志。
+- **手动管理服务**：`sudo systemctl start/stop/restart/status shaneshark-backend` 来管理服务。
 - **前端要自定义域名**：部署完毕后，在仓库 `Settings → Pages` 中绑定 CNAME，或直接在 `frontend/public` 新增 `CNAME` 文件以便 workflow 打包。
 
 ---
