@@ -86,25 +86,24 @@ jobs:
             SERVICE_FILE="/etc/systemd/system/${APP_NAME}.service"
             if [ ! -f "$SERVICE_FILE" ]; then
               echo "创建 systemd 服务文件..."
-              sudo tee "$SERVICE_FILE" > /dev/null <<EOF
-[Unit]
-Description=ShaneShark Backend Application
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=$DEPLOY_PATH
-EnvironmentFile=/root/envFiles/.env
-ExecStart=/usr/bin/java -jar $DEPLOY_PATH/app.jar
-Restart=always
-RestartSec=10
-StandardOutput=journal
-StandardError=journal
-
-[Install]
-WantedBy=multi-user.target
-EOF
+              sudo bash -c "printf '%s\n' \
+                '[Unit]' \
+                'Description=ShaneShark Backend Application' \
+                'After=network.target' \
+                '' \
+                '[Service]' \
+                'Type=simple' \
+                'User=root' \
+                \"WorkingDirectory=$DEPLOY_PATH\" \
+                'EnvironmentFile=/root/envFiles/.env' \
+                \"ExecStart=/usr/bin/java -jar $DEPLOY_PATH/app.jar\" \
+                'Restart=always' \
+                'RestartSec=10' \
+                'StandardOutput=journal' \
+                'StandardError=journal' \
+                '' \
+                '[Install]' \
+                'WantedBy=multi-user.target' > $SERVICE_FILE"
               systemctl daemon-reload
               systemctl enable "$APP_NAME"
             fi
