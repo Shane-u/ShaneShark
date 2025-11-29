@@ -11,7 +11,7 @@ on:
 env:
   APP_NAME: shaneshark-backend
   APP_PORT: 8121
-  DEPLOY_PATH: /opt/shaneshark
+  DEPLOY_PATH: /root/project/shaneshark_backend
   JAR_NAME: shaneShark-0.0.1-SNAPSHOT.jar
 
 jobs:
