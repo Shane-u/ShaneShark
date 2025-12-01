@@ -1,252 +1,193 @@
-# ShaneShark · Full Stack Portal
+<div align="center">
 
-欢迎来到 ShaneShark。仓库里现在有 **前端 (`frontend/`) React 站点** 和 **后端 (`backend/`) Spring Boot API**。这个 README 是整份“说明书”——只要跟着它，你就能在本地启动、修改、并把新版应用部署到服务器或 GitHub Pages。
+  <h1>ShaneShark · 全栈个人门户</h1>
+
+  <img src="https://img.shields.io/badge/Frontend-React%2018-blue.svg" alt="React 18" />
+  <img src="https://img.shields.io/badge/Build-Vite%205-brightgreen.svg" alt="Vite" />
+  <img src="https://img.shields.io/badge/Style-TailwindCSS-38bdf8.svg" alt="TailwindCSS" />
+  <img src="https://img.shields.io/badge/State-Zustand-8b5cf6.svg" alt="Zustand" />
+  <img src="https://img.shields.io/badge/Backend-Spring%20Boot%203-orange.svg" alt="Spring Boot 3" />
+  <img src="https://img.shields.io/badge/DB-MySQL-blue.svg" alt="MySQL" />
+
+</div>
+
+<div align="center">
+
+  <p>🦈 个人主页 + 博客内容 + QA 知识库的全栈门户项目</p>
+  <p>💡 前端动画丰富、后端接口完善，适合作为个人展示站或学习项目模板</p>
+
+</div>
 
 ---
 
-## 目录速览
+## 🚀 项目简介
 
-```
+**ShaneShark** 是一个前后端分离的个人门户 / 博客项目，提供：
+
+- 主页与个人品牌展示
+- 卡片式内容展示（项目 / 博客 / 推荐）
+- QA 知识库模块（问题管理、富文本答案、标签筛选）
+- 基于 Spring Boot 的统一 `/api` 后端接口
+
+本 README 只包含**项目功能介绍与基础使用方式**，不会记录任何服务器地址、账号口令等隐私信息，也不会当作开发日志使用。
+
+---
+
+## 🎯 核心亮点
+
+- **前后端分离**：React 18 + Vite 前端，Spring Boot 3 后端，结构清晰
+- **现代前端体验**：Tailwind CSS + 动效库（如 GSAP），支持响应式布局和动画
+- **可配置内容**：个人信息与大部分文案集中在前端数据文件中，方便快速定制
+- **QA 知识库**：支持标签筛选、富文本答案、推荐区块与后台管理
+- **标准化接口**：后端提供规范化 REST API，可进一步对接移动端 / 其他前端
+
+---
+
+## 🧱 技术选型（简要）
+
+| 模块     | 技术栈                                   | 说明                     |
+|----------|------------------------------------------|--------------------------|
+| 前端     | React 18、TypeScript、Vite、TailwindCSS、Zustand | 单页应用 + 状态管理        |
+| 动效     | 动画库（如 GSAP、Magic UI 等）            | 页面转场与组件动画        |
+| 后端     | Spring Boot 3、Maven                     | REST API 服务            |
+| 数据库   | MySQL                                    | 主业务与 QA 模块数据存储  |
+| CI / 构建 | GitHub Actions                          | 自动构建与基础检查        |
+
+---
+
+## 📁 目录结构
+
+```text
 ShaneShark/
-├─ frontend/        # React 18 + Vite + Tailwind + Zustand + GSAP
-├─ backend/         # Spring Boot 3 + Maven + Dockerfile
-└─ .github/workflows/
-   ├─ ci.yml                # 前后端统一 CI
-   ├─ deploy.yml            # 前端部署到 GitHub Pages
-   └─ backend-deploy.yml    # 后端 Docker 化并发布到服务器
+├─ frontend/              # 前端单页应用（SPA）
+├─ backend/               # 后端 REST API 服务
+└─ .github/workflows/     # CI / 构建配置
 ```
 
 ---
 
-## 前端：React 18 + Vite
+## ⚙️ 快速开始
 
-| 项 | 说明 |
-| --- | --- |
-| 技术 | React 18、TypeScript、Vite 5、Tailwind CSS、Zustand、GSAP |
-| 启动 | `cd frontend && npm install && npm run dev`（默认 http://localhost:5173） |
-| 构建 | `npm run build`（会自动跑 `tsc -b` + `vite build`） |
-| 代码结构 | 详见 `frontend/README.md`（组件、store、动画、主题均整理完毕） |
-| 产物 | `frontend/dist` 被上传到 GitHub Pages，URL 见 workflow 输出 |
+### 前端启动（`frontend/`）
 
-> 小贴士：所有个人信息都集中在 `frontend/src/store/profile-data.ts`，替换里面的文案就能改整站内容。
+**环境要求：**
 
----
+- Node.js（推荐 18+）
+- npm / pnpm / yarn（本说明示例使用 npm）
 
-## 后端：Spring Boot
-
-| 项 | 说明 |
-| --- | --- |
-| 技术 | Spring Boot 3、Maven、MySQL（见 `backend/sql/`） |
-| 启动 | `cd backend && ./mvnw spring-boot:run`（或 `mvn spring-boot:run`） |
-| 构建 | `mvn -B -ntp clean package` 会输出 `backend/target/*.jar` |
-| 部署 | CI 会自动构建 JAR 并通过 SCP 传输到服务器，使用 systemd 服务管理 |
-| 端口 | 默认 `8121`，可在 workflow `env.APP_PORT` 调整 |
-| API 路径 | `/api`（完整 URL: `http://服务器地址:8121/api`） |
-| 接口文档 | 部署后访问 `http://服务器地址:8121/api/doc.html`（Knife4j） |
-
-> 数据库脚本位于 `backend/sql/`，先执行 `create_table.sql` 再导入其他基础数据。
-
-### 测试后端服务
-
-部署完成后，可以使用以下方法测试服务是否正常：
-
-#### 方法 1: 使用测试脚本（推荐）
+**本地运行：**
 
 ```bash
-# 在项目根目录执行
-./test-backend.sh http://你的服务器地址:8121
-
-# 或者测试本地服务
-./test-backend.sh http://localhost:8121
+cd frontend
+npm install
+npm run dev
 ```
 
-测试脚本会自动测试多个接口，包括：
-- 服务连接测试
-- 获取验证码接口
-- MCP 调试工具接口
-- 用户列表接口
-- 文章列表接口
-- 其他基础接口
+浏览器访问终端输出的开发地址（通常为 `http://localhost:5173`）。
 
-#### 方法 2: 使用 curl 命令快速测试
+**构建生产包：**
 
 ```bash
-# 1. 测试服务是否可达
-curl http://你的服务器地址:8121/api/user/captcha
-
-# 2. 测试获取验证码（最简单，不需要登录）
-curl -X GET "http://你的服务器地址:8121/api/user/captcha"
-
-# 3. 测试用户列表接口
-curl -X POST "http://你的服务器地址:8121/api/user/list/page/vo" \
-  -H "Content-Type: application/json" \
-  -d '{"current":1,"pageSize":10}'
-
-# 4. 测试文章列表接口
-curl -X POST "http://你的服务器地址:8121/api/post/list/page/vo" \
-  -H "Content-Type: application/json" \
-  -d '{"current":1,"pageSize":10}'
+cd frontend
+npm run build
 ```
 
-#### 方法 3: 访问接口文档
+构建产物默认输出到 `frontend/dist`，可部署到任意静态托管平台（如 GitHub Pages 等）。
 
-部署后访问 Knife4j 接口文档：
-```
-http://你的服务器地址:8121/api/doc.html
-```
+> 提示：站点的大部分文案和个人信息集中在 `frontend/src/store/profile-data.ts`，修改该文件即可快速定制你的主页内容。
 
-在文档中可以：
-- 查看所有可用接口
-- 在线测试接口
-- 查看请求/响应示例
+---
 
-#### 方法 4: 检查服务状态（在服务器上）
+### 后端启动（`backend/`）
 
-**使用检查脚本（推荐）:**
+**环境要求：**
+
+- JDK 17+
+- Maven
+- MySQL 数据库（版本 8.x 或兼容版本）
+
+**准备数据库：**
+
+- 在 MySQL 中创建对应数据库
+- 执行 `backend/sql/` 目录下的建表脚本（包含 QA 模块表结构）
+
+**配置应用：**
+
+- 在 `backend` 中配置自己的数据库连接与基础配置（例如 `application.yml` 或 `.env`）
+- 注意不要将真实账号、密码等敏感信息提交到代码仓库
+
+**本地运行：**
 
 ```bash
-# 1. 将 check-server.sh 上传到服务器，或直接在服务器上创建
-# 2. SSH 到服务器后执行
-chmod +x check-server.sh
-./check-server.sh
+cd backend
+./mvnw spring-boot:run    # 或 mvn spring-boot:run
 ```
 
-脚本会自动检查：
-- systemd 服务状态
-- JAR 文件是否存在
-- 端口是否监听
-- Java 进程是否运行
-- 环境变量文件
-- 服务日志
-- 防火墙状态
-- 本地连接测试
-
-**手动检查命令:**
+**打包构建：**
 
 ```bash
-# SSH 到服务器后执行
-
-# 1. 检查 systemd 服务状态
-sudo systemctl status shaneshark-backend
-
-# 2. 查看服务日志（实时）
-sudo journalctl -u shaneshark-backend -f
-
-# 3. 查看最近日志
-sudo journalctl -u shaneshark-backend -n 50 --no-pager
-
-# 4. 检查端口是否监听
-sudo netstat -tlnp | grep 8121
-# 或
-sudo ss -tlnp | grep 8121
-
-# 5. 检查 Java 进程
-ps aux | grep java
-
-# 6. 检查 JAR 文件
-ls -lh /root/project/shaneshark_backend/app.jar
-
-# 7. 测试本地连接
-curl http://localhost:8121/api/user/captcha
-
-# 8. 重启服务（如果需要）
-sudo systemctl restart shaneshark-backend
-sudo systemctl status shaneshark-backend
+cd backend
+mvn -B -ntp clean package
 ```
 
-#### 常见问题排查
-
-如果测试失败，检查以下几点：
-
-1. **服务未启动**
-   ```bash
-   sudo systemctl start shaneshark-backend
-   sudo systemctl status shaneshark-backend
-   ```
-
-2. **端口未开放**
-   - 检查服务器防火墙是否开放 8121 端口
-   - 检查云服务器安全组规则
-
-3. **数据库连接失败**
-   - 检查 `/root/envFiles/.env` 中的数据库配置
-   - 确认数据库服务正在运行
-
-4. **查看详细日志**
-   ```bash
-   sudo journalctl -u shaneshark-backend -n 100 --no-pager
-   ```
-
-### 后端环境变量
-
-1. 复制示例：`cp backend/.env-example backend/.env`。
-2. 打开 `backend/.env`，把数据库、邮件、AI Key 等信息填入（该文件已在 `.gitignore` 中，不会被提交）。
-3. `Spring Boot` 会通过 `spring.config.import` 自动加载同目录下的 `.env`，因此只要在本地或服务器启动前确保 `.env` 与项目根目录/运行目录同级即可。生产服务器当前固定存放在 `/root/envFiles/.env`，供 systemd 服务以 `EnvironmentFile` 方式读取。
-4. 服务器部署（自动完成）：
-   - CI 会自动将 JAR 文件传输到 `/root/project/shaneshark_backend/app.jar`
-   - 自动创建 systemd 服务文件 `/etc/systemd/system/shaneshark-backend.service`
-   - 服务会自动读取 `/root/envFiles/.env` 环境变量文件
-   - 服务会自动启动并设置为开机自启
-
-这样无论本地还是服务器都只需要维护 `.env`，就能在运行时读取敏感配置。
-
-### 验证码邮件模板
-
-- 位置：`backend/src/main/resources/templates/verification-email.html`
-- 风格：深色玻璃拟态 + Shane 个人品牌（ShaneShark 标识、个人签名）
-- 用法：模板内部包含 `{{VERIFICATION_CODE}}` 占位符，后端在渲染模板时会自动注入实际验证码
-- 自定义：如需调整色彩或文案，只需修改 CSS 变量或 `.header` / `.footer` 文本即可，无需改动后端逻辑
-
-> 该模板已经针对移动端做自适应处理，同时强化了安全提醒文案，方便你在个人博客场景下直接使用。
+打包后会在 `backend/target` 目录生成 JAR 文件，可根据自己的习惯采用 systemd、Docker 或云平台进行部署。
 
 ---
 
-## CI/CD 总览
+## 📚 QA 知识库模块
 
-| Workflow | 触发场景 | 作用 |
-| --- | --- | --- |
-| `ci.yml` | push / PR 到 `main` 或 `master` | 前端：`npm ci` → `eslint` → `tsc --noEmit` → `vite build`；后端：`mvn clean verify`；都会上传构建产物（`frontend-dist`、`backend-jar`） |
-| `deploy.yml` | push `frontend/**` 或手动触发 | 在 Linux Runner 里构建前端并部署到 GitHub Pages |
-| `backend-deploy.yml` | push `backend/**` 或手动触发 | 构建 Spring Boot JAR → SCP 传输到服务器 → 使用 systemd 服务管理并重启应用 |
+项目内集成了一个 **QA 知识库模块**，用于管理与展示问答内容，适合记录学习笔记、面试题、日常问题等。
 
-### 必备 Secrets
+- **主要能力：**
+  - QA 卡片展示（支持 PC / 移动端响应式）
+  - 标签筛选与分类浏览
+  - 每日推荐 / 精选展示区块
+  - 后台管理（新增 / 编辑 / 删除 QA）
+  - 基于语雀 Lake 文档格式 `text/lake` 的富文本编辑与阅读
 
-| Secret | 用途 |
-| --- | --- |
-| `SSH_PRIVATE_KEY` | 部署服务器的私钥（建议只给出部署用账号权限） |
-| `SERVER_HOST` | 服务器公网 IP 或域名 |
-| `SERVER_USER` | SSH 登录用户（例如 `root` 或 `deploy`） |
+- **典型访问路径（示例）：**
+  - QA 列表页：`/#/qa`
+  - QA 详情页：`/#/qa/{id}`
+  - QA 编辑页：`/#/qa/edit/{id}` 或 `/#/qa/edit/new`
 
-> **注意**：服务器需要安装 Java 17 和 systemd。部署脚本会自动创建 systemd 服务文件，应用会以服务形式运行，支持自动重启。
-
----
-
-## 快速部署步骤
-
-1. **准备 Secrets**（上面列表）并在仓库 Settings → Secrets & variables → Actions 中填写。
-2. **首发前端**：Push 到 `main`（或在 Actions 里手动 Dispatch `Deploy Frontend to GitHub Pages`）。稍等片刻即可在仓库 Pages 面板看到访问地址。
-3. **首发后端**：Push `backend/**`，`Deploy Backend to Server` workflow 会自动：
-   - 用 Maven 打包 JAR
-   - 通过 SCP 将 JAR 文件传输到服务器的 `/opt/shaneshark/app.jar`
-   - SSH 到服务器，停止旧进程，创建/更新 systemd 服务，并启动应用
-4. **日常更新**：正常提交并推送即可。CI 会先验证代码，通过后相应部署流程才会执行。
+QA 数据默认存储在后端数据库的 `qa_info` 表中，建表 SQL 位于 `backend/sql` 目录，字段与索引结构可直接参考对应 SQL 文件。
 
 ---
 
-## 常见问题
+## 🤖 CI / 自动化概览
 
-- **我想换服务器端口**：改 `backend-deploy.yml` 里的 `env.APP_PORT`，同时记得在服务器安全组里开放对应端口，并更新 `application.yml` 中的 `server.port`。
-- **查看应用日志**：在服务器上执行 `journalctl -u shaneshark-backend -f` 查看实时日志，或 `journalctl -u shaneshark-backend -n 100` 查看最近 100 条日志。
-- **手动管理服务**：`sudo systemctl start/stop/restart/status shaneshark-backend` 来管理服务。
-- **前端要自定义域名**：部署完毕后，在仓库 `Settings → Pages` 中绑定 CNAME，或直接在 `frontend/public` 新增 `CNAME` 文件以便 workflow 打包。
+仓库内包含 GitHub Actions 配置，用于：
+
+- 在代码推送时自动执行前后端的构建与基础检查
+- 为后续接入自动部署打下基础（可根据自己环境做扩展）
+
+> 与服务器、密钥、口令相关的配置，**建议使用 GitHub Secrets 或其他安全方式管理**，不要写入 README 或提交到代码库中。
 
 ---
 
-## 下一步（建议）
+## 🔐 安全与隐私建议
 
-- [ ] `frontend/src` 增加 Vitest + Testing Library，直接接入 `ci.yml`
-- [ ] 把 `backend` 部署脚本拆成服务器上的 `deploy.sh`，workflow 只需调用一个脚本，方便权限控制
-- [ ] 接入日志与性能监控（前端可用 Vercel Analytics / backend 可用 Spring Boot Actuator + Prometheus）
+- 不在公开文档中记录：
+  - 服务器 IP / 域名
+  - 登录账号 / 私钥 / 明文密码
+  - 管理员口令、Token、API Key 等
+- 推荐做法：
+  - 使用环境变量、`.env` 文件或 CI/CD 平台的 Secrets 存储敏感信息
+  - 将详细运维步骤放在自己的私密文档中维护
 
-祝你开发顺利！如果遇到不确定的地方，直接告诉我“哪里卡住了”，我会帮你一起补完。***
+---
+
+## 👨‍💻 维护者
+
+| 姓名  | 角色       |
+|-------|------------|
+| Shane | 项目开发者 |
+
+欢迎通过 Issue / PR 等方式参与改进本项目。
+
+---
+
+## 📄 License
+
+本项目保持开源精神，允许在遵守原有协议的前提下自由使用与二次开发。你可以将它作为自己的个人主页模板、学习项目或简历作品展示工程。 
 

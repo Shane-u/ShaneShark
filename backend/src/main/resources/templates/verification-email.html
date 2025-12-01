@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShaneShark · 验证码</title>
+    <title>ShaneShark · 安全验证码</title>
     <style>
         :root {
             --bg: #030712;
-            --card: rgba(15, 23, 42, 0.92);
+            --card-gradient: radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.35), transparent 55%),
+                              radial-gradient(circle at 80% 0%, rgba(250, 204, 21, 0.25), transparent 45%),
+                              rgba(2, 6, 23, 0.9);
+            --surface: rgba(15, 23, 42, 0.7);
             --accent: #38bdf8;
             --accent-strong: #0ea5e9;
-            --muted: #94a3b8;
-            --text: #e2e8f0;
-            --border: rgba(56, 189, 248, 0.2);
+            --text: #f8fafc;
+            --muted: #cbd5f5;
+            --border: rgba(88, 113, 196, 0.35);
+            --glow: rgba(14, 165, 233, 0.35);
         }
 
         * {
@@ -23,240 +27,210 @@
 
         body {
             font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: radial-gradient(circle at top, rgba(56, 189, 248, 0.15), transparent 55%), var(--bg);
+            background: radial-gradient(circle at top, rgba(14, 165, 233, 0.25), transparent 60%), var(--bg);
             color: var(--text);
             min-height: 100vh;
-            padding: 32px 16px;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 48px 16px;
         }
 
-        .email-container {
+        .shell {
             width: 100%;
-            max-width: 560px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            box-shadow: 0 25px 80px rgba(2, 6, 23, 0.55);
-            overflow: hidden;
-            position: relative;
+            max-width: 620px;
         }
 
-        .email-container::after {
+        .card {
+            position: relative;
+            background: var(--card-gradient);
+            border-radius: 32px;
+            padding: 48px 40px 40px;
+            border: 1px solid var(--border);
+            box-shadow: 0 30px 110px rgba(2, 6, 23, 0.65), inset 0 0 60px rgba(15, 23, 42, 0.85);
+            overflow: hidden;
+        }
+
+        .card::after {
             content: '';
             position: absolute;
             inset: 12px;
             border-radius: 24px;
-            border: 1px solid rgba(226, 232, 240, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             pointer-events: none;
         }
 
-        .header {
-            padding: 48px 40px 20px;
-        }
-
-        .brand {
-            font-size: 14px;
-            letter-spacing: 0.2em;
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
             text-transform: uppercase;
+            letter-spacing: 0.2em;
             color: var(--muted);
-            margin-bottom: 12px;
         }
 
-        .title-row {
-            display: flex;
-            align-items: baseline;
-            gap: 12px;
+        .badge::before {
+            content: '';
+            width: 32px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--muted));
         }
 
-        .title {
-            font-size: 28px;
+        h1 {
+            margin-top: 18px;
+            font-size: 32px;
             font-weight: 600;
         }
 
-        .title span {
+        h1 span {
             color: var(--accent);
         }
 
-        .tagline {
+        .subtitle {
+            margin-top: 8px;
+            color: var(--muted);
             font-size: 16px;
-            color: var(--muted);
         }
 
-        .content {
-            padding: 0 40px 32px;
-        }
-
-        .greeting {
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-
-        .message {
-            font-size: 15px;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        .code-pill {
-            margin: 32px auto;
-            width: 100%;
-            max-width: 320px;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--accent);
-            border-radius: 24px;
-            padding: 18px 24px;
-            letter-spacing: 10px;
-            font-size: 32px;
-            font-weight: 700;
-            text-align: center;
-            color: var(--accent);
-            box-shadow: inset 0 0 30px rgba(14, 165, 233, 0.15);
+        .code-board {
             position: relative;
+            margin: 40px auto;
+            width: min(400px, 100%);
+            padding: 28px 36px;
+            border-radius: 28px;
+            background: var(--surface);
+            border: 1px solid rgba(226, 232, 240, 0.08);
+            box-shadow: 0 30px 70px rgba(8, 25, 64, 0.45), inset 0 0 40px rgba(8, 47, 73, 0.6);
         }
 
-        .code-pill::before {
-            content: '';
+        .code-board::before {
+            content: 'Security Code';
             position: absolute;
-            inset: 2px;
-            border-radius: 22px;
-            border: 1px solid rgba(56, 189, 248, 0.25);
-        }
-
-        .list-card {
-            background: rgba(15, 23, 42, 0.65);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 18px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
-        }
-
-        .list-card strong {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 14px;
-            letter-spacing: 0.08em;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 16px;
+            font-size: 11px;
+            letter-spacing: 0.18em;
             text-transform: uppercase;
-            color: var(--accent);
+            background: #040a1a;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .list-card ul {
+        .code-value {
+            font-size: clamp(34px, 7vw, 46px);
+            letter-spacing: 0.55em;
+            text-align: center;
+            font-weight: 700;
+            color: var(--accent);
+            text-shadow: 0 0 30px var(--glow);
+        }
+
+        .info {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(226, 232, 240, 0.75);
+        }
+
+        .panel {
+            margin-top: 28px;
+            padding: 24px;
+            border-radius: 22px;
+            border: 1px solid rgba(226, 232, 240, 0.08);
+            background: rgba(4, 7, 15, 0.65);
+        }
+
+        .panel strong {
+            display: block;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .panel ul {
             list-style: none;
             color: var(--muted);
             line-height: 1.6;
         }
 
-        .list-card li {
+        .panel li {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 4px 0;
+            padding: 6px 0;
         }
 
-        .list-card li::before {
+        .panel li::before {
             content: '';
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             border-radius: 999px;
             background: var(--accent);
-            display: inline-block;
+            box-shadow: 0 0 10px var(--glow);
         }
 
         .footer {
-            padding: 28px 40px 40px;
-            border-top: 1px solid rgba(148, 163, 184, 0.15);
-            text-align: left;
+            margin-top: 36px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(226, 232, 240, 0.8);
         }
 
-        .signature {
-            font-size: 16px;
-            margin-bottom: 12px;
-        }
-
-        .signature span {
+        .footer strong {
             color: var(--accent-strong);
         }
 
-        .footer-meta {
-            font-size: 13px;
-            color: var(--muted);
-            line-height: 1.5;
-        }
-
         @media (max-width: 540px) {
-            .email-container {
-                border-radius: 20px;
+            .card {
+                padding: 36px 24px;
+                border-radius: 24px;
             }
 
-            .header,
-            .content,
-            .footer {
-                padding: 32px 24px;
+            .card::after {
+                inset: 10px;
             }
 
-            .code-pill {
-                letter-spacing: 8px;
-                font-size: 26px;
+            .code-board {
+                padding: 22px 24px;
+                border-radius: 22px;
             }
         }
     </style>
 </head>
 <body>
-<div class="email-container">
-    <!-- Header -->
-    <div class="header">
-        <div class="brand">ShaneShark</div>
-        <div class="title-row">
-            <div class="title">验证码 · <span>Shane</span></div>
-            <div class="tagline">私域博客安全验证</div>
-        </div>
-    </div>
-
-    <!-- Content -->
-    <div class="content">
-        <div class="greeting">你好，朋友！</div>
-        <p class="message">
-            你正在尝试登录或操作 <strong>Shane</strong> 的个人博客，这是一封一次性验证码通知。
-            出于安全考虑，请在 10 分钟内输入下面的验证码完成操作。
+<div class="shell">
+    <div class="card">
+        <div class="badge">ShaneShark · Secure Channel</div>
+        <h1>验证码到达 · <span>Shane</span></h1>
+        <p class="subtitle">
+            你正在登录 / 注册 Shane 的个人知识库。为了保护账号安全，请在 10 分钟内输入以下验证码。
         </p>
 
-        <div class="code-pill">{{VERIFICATION_CODE}}</div>
+        <div class="code-board">
+            <div class="code-value">{{VERIFICATION_CODE}}</div>
+            <p class="info">Expires in 10 minutes · One-time use only</p>
+        </div>
 
-        <div class="list-card">
+        <div class="panel">
             <strong>安全提醒</strong>
             <ul>
-                <li>验证码仅供当前操作使用，勿向任何人泄露</li>
-                <li>若非你本人操作，请立即忽略并删除此邮件</li>
-                <li>如遇到异常，可随时回复邮件联系 Shane</li>
+                <li>验证码仅用于当前操作，请勿告诉任何人</li>
+                <li>如非本人操作，建议立刻忽略并删除此邮件</li>
+                <li>如需帮助，可直接回复邮件联系 Shane</li>
             </ul>
         </div>
-    </div>
 
-    <!-- Footer -->
-    <div class="footer">
-        <div class="signature">保持灵感，继续创作 — <span>Shane</span></div>
-        <div class="footer-meta">
-            ShaneShark · Personal Blog<br>
-            这封信由系统自动发送，请勿直接回复
+        <div class="footer">
+            保持灵感，持续创作 — <strong>Shane</strong><br/>
+            ShaneShark · Personal Knowledge Hub · 本邮件由系统自动发出
         </div>
     </div>
 </div>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

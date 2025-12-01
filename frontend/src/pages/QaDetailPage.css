@@ -1,0 +1,115 @@
+.qa-detail-page {
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--bg-color, #f5f5f5);
+}
+
+.qa-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.qa-detail-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.qa-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.qa-detail-tag {
+  display: inline-block;
+  padding: 6px 16px;
+  background: #e6f7ff;
+  color: #1890ff;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.qa-detail-question {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #262626;
+  line-height: 1.5;
+}
+
+.qa-detail-meta {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.qa-detail-content {
+  margin-top: 32px;
+}
+
+.ne-doc-major-viewer {
+  min-height: 400px;
+}
+
+.qa-detail-error-banner {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(248, 113, 113, 0.15);
+  color: #dc2626;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  font-size: 14px;
+}
+
+/* 夜间模式适配：统一改成浅色文字 + 深色背景，避免黑底黑字 */
+html.dark .qa-detail-page {
+  background: radial-gradient(circle at top, #020617 0%, #020617 55%, #020617 100%);
+}
+
+html.dark .qa-detail-container {
+  background: #020617;
+  color: #e5e7eb;
+  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+html.dark .qa-detail-question {
+  color: #f9fafb !important;
+}
+
+html.dark .qa-detail-meta {
+  border-bottom-color: rgba(51, 65, 85, 0.9);
+  color: #9ca3af !important;
+}
+
+/* 夜间模式下为语雀阅读器提供默认浅色文字，交由文档自身决定高亮颜色 */
+html.dark .ne-doc-major-viewer .ne-viewer .ne-viewer-body {
+  color: #e5e7eb;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .qa-detail-page {
+    padding: 16px;
+  }
+
+  .qa-detail-container {
+    padding: 20px;
+  }
+
+  .qa-detail-question {
+    font-size: 20px;
+  }
+}
+

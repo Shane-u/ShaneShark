@@ -1,0 +1,300 @@
+:root {
+  --qa-edit-bg: #f5f5f5;
+  --qa-edit-card-bg: #ffffff;
+  --qa-edit-card-border: rgba(15, 23, 42, 0.08);
+  --qa-edit-text: #1f2937;
+  --qa-edit-subtle-text: #8c8c8c;
+  --qa-edit-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+}
+
+.dark {
+  --qa-edit-bg: #050506;
+  --qa-edit-card-bg: rgba(5, 6, 12, 0.92);
+  --qa-edit-card-border: rgba(148, 163, 184, 0.35);
+  --qa-edit-text: #f8fafc;
+  --qa-edit-subtle-text: #cbd5f5;
+  --qa-edit-shadow: 0 12px 36px rgba(2, 6, 23, 0.65);
+}
+
+.qa-edit-page {
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--qa-edit-bg);
+  color: var(--qa-edit-text);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.qa-edit-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.qa-edit-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 16px;
+}
+
+.qa-edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--qa-edit-card-bg);
+  border-radius: 16px;
+  border: 1px solid var(--qa-edit-card-border);
+  box-shadow: var(--qa-edit-shadow);
+}
+
+.qa-edit-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.qa-edit-form.ant-card,
+.qa-edit-form.ant-card-bordered {
+  background: var(--qa-edit-card-bg) !important;
+  border-radius: 32px;
+  border: 1px solid var(--qa-edit-card-border);
+  box-shadow: var(--qa-edit-shadow);
+  color: var(--qa-edit-text);
+  backdrop-filter: blur(24px);
+}
+
+.qa-edit-form .ant-card-body {
+  background: transparent;
+  padding: 24px;
+  color: inherit;
+}
+
+.qa-edit-button {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.qa-edit-button.ghost {
+  background: transparent;
+  color: var(--qa-edit-text);
+  border-color: var(--qa-edit-card-border);
+}
+
+.qa-edit-button.primary {
+  background: linear-gradient(120deg, #3b82f6, #6366f1);
+  color: white;
+  border: none;
+}
+
+.qa-edit-button.primary:hover {
+  box-shadow: 0 0 24px rgba(79, 70, 229, 0.35);
+}
+
+.qa-edit-form-item {
+  margin-bottom: 24px;
+}
+
+.qa-edit-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.qa-edit-refresh-fancy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 4px 10px;
+  color: #111827;
+  text-shadow: 1px 1px rgba(107, 114, 128, 0.9);
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid #111827;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  font-size: 12px;
+  background-color: hsl(49deg 98% 60%);
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.qa-edit-refresh-fancy-button:active {
+  transform: scale(0.94);
+  transition: all 120ms ease;
+}
+
+.qa-edit-refresh-fancy-button svg {
+  transition: all 0.4s ease;
+  z-index: 2;
+}
+
+.qa-edit-refresh-play {
+  transition: all 0.4s ease;
+  transition-delay: 220ms;
+}
+
+.qa-edit-refresh-fancy-button:hover svg {
+  /* 放大同时向右移动更多，让小人完全露出来，不贴在左边框上 */
+  transform: scale(2.6) translateX(80%);
+}
+
+.qa-edit-refresh-now {
+  position: absolute;
+  left: 14px;
+  transform: translateX(-160%);
+  transition: all 0.4s ease;
+  z-index: 2;
+}
+
+.qa-edit-refresh-fancy-button:hover .qa-edit-refresh-now {
+  transform: translateX(0px);
+  transition-delay: 220ms;
+}
+
+.qa-edit-refresh-fancy-button:hover .qa-edit-refresh-play {
+  transform: translateX(220%);
+  transition-delay: 220ms;
+}
+
+.qa-edit-editor-skeleton {
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.qa-edit-error-banner {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(250, 204, 21, 0.12);
+  color: #92400e;
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  font-size: 14px;
+}
+
+.qa-edit-form-item label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--qa-edit-text);
+}
+
+.qa-edit-form :where(.ant-input,
+.ant-input-affix-wrapper,
+.ant-select-selector,
+.ant-select-selection-placeholder,
+.ant-select-selection-item,
+.ant-checkbox-wrapper,
+.ant-checkbox + span) {
+  background: transparent;
+  color: var(--qa-edit-text);
+  border-color: var(--qa-edit-card-border);
+  transition: all 0.2s ease;
+}
+
+.qa-edit-form :where(.ant-input,
+.ant-input-affix-wrapper,
+.ant-select-selector) {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: var(--qa-edit-text) !important;
+  border-radius: 12px;
+  border-width: 1.5px;
+}
+
+.dark .qa-edit-form :where(.ant-input,
+.ant-input-affix-wrapper,
+.ant-select-selector) {
+  background: rgba(5, 6, 12, 0.95) !important;
+  color: #f8fafc !important;
+  border-color: rgba(148, 163, 184, 0.4) !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
+.qa-edit-form :where(.ant-input::placeholder,
+.ant-select-selection-placeholder) {
+  color: var(--qa-edit-subtle-text);
+}
+
+.dark .qa-edit-form :where(.ant-input::placeholder,
+.ant-select-selection-placeholder) {
+  color: rgba(226, 232, 240, 0.65);
+}
+
+.qa-edit-form :where(.ant-input:hover,
+.ant-input-affix-wrapper:hover,
+.ant-select-selector:hover,
+.ant-input:focus,
+.ant-input-affix-wrapper-focused,
+.ant-select-focused .ant-select-selector) {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+}
+
+.qa-edit-form :where(.ant-input::placeholder,
+.ant-select-selection-placeholder) {
+  color: var(--qa-edit-subtle-text);
+}
+
+.qa-edit-form :where(.ant-checkbox + span) {
+  color: var(--qa-edit-text);
+  margin-inline-start: 15px;
+}
+
+.qa-edit-form :where(.ant-checkbox-wrapper) {
+  /* 恢复为接近 AntD 默认样式，避免影响其他 Checkbox */
+  display: inline-block;
+}
+
+/* 专门给“标记为精选”这一行加的 flex 对齐样式 */
+.qa-edit-hot-checkbox.ant-checkbox-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0px;
+  line-height: 1.5;
+}
+
+.qa-edit-hot-checkbox.ant-checkbox-wrapper .ant-checkbox {
+  top: 0;
+}
+
+.qa-edit-helper-text {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--qa-edit-subtle-text);
+}
+
+.ne-doc-major-editor {
+  border: 1px solid var(--qa-edit-card-border);
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.dark .ne-doc-major-editor {
+  background: rgba(5, 6, 12, 0.8);
+  color: #f8fafc;
+  backdrop-filter: blur(6px);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .qa-edit-page {
+    padding: 16px;
+  }
+
+  .qa-edit-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+}
+

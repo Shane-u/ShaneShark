@@ -2,7 +2,7 @@ spring:
   config:
     import: optional:file:.env[.properties]
   application:
-    name: digital-college-students-backend
+    name: shaneshark-backend
   profiles:
     active: dev
   ai:
@@ -31,6 +31,10 @@ spring:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD} # 需要在 .env 中提供
+  # SQLite配置（QA模块使用）
+  sqlite:
+    db:
+      path: ${SQLITE_DB_PATH:./data/qa.db} # SQLite数据库文件路径
   # 邮件配置
   mail:
     host: smtp.163.com
@@ -163,3 +167,7 @@ kimi:
   base-url: ${KIMI_BASE_URL:https://ark.cn-beijing.volces.com/api/v3}
   model: ${KIMI_MODEL:kimi-k2-250905}
   timeout: ${KIMI_TIMEOUT:60000} # 请求超时时间（毫秒）
+
+qa:
+  admin:
+    password: ${QA_ADMIN_PASSWORD}

@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
 import { AnimatedThemeToggler } from '@/registry/magicui/animated-theme-toggler'
+import { LoginWidget } from '@/components/auth/LoginWidget'
 import { NavBrand } from './NavBrand'
 
 const navItems = [
@@ -72,17 +73,24 @@ export function SiteHeader() {
               key={item.label}
               href={`#${item.anchor}`}
               onClick={(e) => handleAnchorClick(e, item.anchor)}
-              className="transition hover:text-accent dark:text-slate-200 dark:hover:text-accent"
+              className="transition hover:text-accent !text-slate-600 dark:!text-slate-200 dark:hover:text-accent"
             >
               {item.label}
             </a>
           ))}
           <NavLink
+            to="/qa"
+            className="rounded-full border border-slate-200 px-4 py-2 text-xs uppercase tracking-wide transition hover:border-accent hover:text-accent !text-slate-600 dark:border-slate-600 dark:!text-slate-100"
+          >
+            QA知识库
+          </NavLink>
+          <NavLink
             to="/favorites"
-            className="rounded-full border border-slate-200 px-4 py-2 text-xs uppercase tracking-wide transition hover:border-accent hover:text-accent dark:border-slate-600 dark:text-slate-100"
+            className="rounded-full border border-slate-200 px-4 py-2 text-xs uppercase tracking-wide transition hover:border-accent hover:text-accent !text-slate-600 dark:border-slate-600 dark:!text-slate-100"
           >
             博客收藏
           </NavLink>
+          <LoginWidget />
           <AnimatedThemeToggler className="ml-2" />
         </nav>
         <div className="hidden items-center gap-3 text-xs text-slate-500 lg:flex font-nav">
@@ -92,7 +100,7 @@ export function SiteHeader() {
               href={social.href}
               target="_blank"
               rel="noreferrer"
-              className="transition hover:text-accent dark:text-slate-300"
+              className="transition hover:text-accent !text-slate-500 dark:!text-slate-300"
             >
               {social.label}
             </a>

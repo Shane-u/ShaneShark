@@ -1,0 +1,137 @@
+/* 卡片文字截断 - Magic UI blog 风格 */
+.qa-card-preview {
+  margin-top: 12px;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.qa-typography {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #1f2933;
+}
+
+/* 夜间模式排版适配：正文与标题改为浅色，表格/代码块略调对比度 */
+html.dark .qa-typography {
+  color: #e5e7eb;
+}
+
+html.dark .qa-typography h1,
+html.dark .qa-typography h2,
+html.dark .qa-typography h3,
+html.dark .qa-typography h4 {
+  color: #f9fafb;
+}
+
+html.dark .qa-typography blockquote {
+  border-left-color: #a855f7;
+  background: rgba(168, 85, 247, 0.12);
+}
+
+html.dark .qa-typography code {
+  background: rgba(15, 23, 42, 0.7);
+  color: #e5e7eb;
+}
+
+html.dark .qa-typography pre {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+html.dark .qa-typography th,
+html.dark .qa-typography td {
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+html.dark .qa-typography tr:nth-child(even) {
+  background: rgba(15, 23, 42, 0.35);
+}
+
+.qa-typography h1,
+.qa-typography h2,
+.qa-typography h3,
+.qa-typography h4 {
+  scroll-margin-top: 80px;
+  letter-spacing: -0.02em;
+  margin-top: 36px;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.qa-typography h1 {
+  font-size: 2.25rem;
+}
+
+.qa-typography h2 {
+  font-size: 1.875rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+  padding-bottom: 12px;
+}
+
+.qa-typography h3 {
+  font-size: 1.5rem;
+}
+
+.qa-typography h4 {
+  font-size: 1.25rem;
+}
+
+.qa-typography p {
+  margin-bottom: 1.2em;
+}
+
+.qa-typography blockquote {
+  margin: 24px 0;
+  padding: 16px 24px;
+  border-left: 4px solid #9e7aff;
+  background: rgba(158, 122, 255, 0.08);
+  font-style: italic;
+}
+
+.qa-typography ul,
+.qa-typography ol {
+  margin: 16px 0 16px 28px;
+}
+
+.qa-typography li {
+  margin-bottom: 8px;
+}
+
+.qa-typography code {
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.9em;
+}
+
+.qa-typography pre {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-size: 14px;
+}
+
+.qa-typography table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 0.95em;
+}
+
+.qa-typography th,
+.qa-typography td {
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.qa-typography tr:nth-child(even) {
+  background: rgba(15, 23, 42, 0.02);
+}
+
+

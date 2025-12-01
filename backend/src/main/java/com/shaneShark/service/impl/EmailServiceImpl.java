@@ -52,7 +52,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             String htmlTemplate = loadEmailTemplate();
             String htmlContent = htmlTemplate.replace("{{VERIFICATION_CODE}}", verificationCode);
-            sendEmail(to, "【数字大学生平台】验证码通知", htmlContent);
+            sendEmail(to, "ShaneShark 验证码", htmlContent);
             
         } catch (Exception e) {
             log.error("发送验证码邮件失败，收件人：{}，错误：{}", to, e.getMessage());
