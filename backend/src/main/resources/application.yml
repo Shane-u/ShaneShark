@@ -51,9 +51,11 @@ spring:
       mail:
         smtp:
           auth: true
+          ssl:
+            enable: true  # 关键：开启 SSL（465 端口必须启用）
           starttls:
-            enable: true
-            required: true
+            enable: false  # 关键：465 端口是 SMTPS 协议，不需要 STARTTLS，设为 false
+            required: false
   # Redis 配置
 #  redis:
 #    database: 1
