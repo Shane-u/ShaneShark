@@ -51,7 +51,8 @@ jobs:
       - name: 配置 SSH 私钥
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.FRONTEND_SSH_PRIVATE_KEY }}
+          # 复用后端部署使用的 SSH_PRIVATE_KEY，避免额外配置新 Secret
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: 加入服务器指纹
         run: |
@@ -62,13 +63,14 @@ jobs:
 
       - name: 上传构建产物到服务器
         env:
-          SSH_TARGET: ${{ secrets.FRONTEND_SERVER_USER }}@${{ env.FRONTEND_SERVER_HOST }}
+          # 复用后端的 SERVER_USER，前提是同一个用户有权限部署前端
+          SSH_TARGET: ${{ secrets.SERVER_USER }}@${{ env.FRONTEND_SERVER_HOST }}
         run: |
           scp "../${{ env.ARCHIVE_NAME }}" "$SSH_TARGET:/tmp/${{ env.ARCHIVE_NAME }}"
 
       - name: 远程部署静态资源
         env:
-          SSH_TARGET: ${{ secrets.FRONTEND_SERVER_USER }}@${{ env.FRONTEND_SERVER_HOST }}
+          SSH_TARGET: ${{ secrets.SERVER_USER }}@${{ env.FRONTEND_SERVER_HOST }}
         run: |
           ssh "$SSH_TARGET" bash -s <<'REMOTE_SCRIPT'
             set -euo pipefail
