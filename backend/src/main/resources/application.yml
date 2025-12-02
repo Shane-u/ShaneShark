@@ -25,13 +25,16 @@ spring:
   session:
     # 30 天过期
     timeout: 2592000
-  # 数据库配置
+  # 数据库配置 - 使用SQLite作为主数据源
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${MYSQL_URL}
-    username: ${MYSQL_USERNAME}
-    password: ${MYSQL_PASSWORD} # 需要在 .env 中提供
-  # SQLite配置（QA模块使用）
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:${SQLITE_DB_PATH:./data/qa.db}
+    # MySQL配置已禁用，项目使用SQLite
+    # driver-class-name: com.mysql.cj.jdbc.Driver
+    # url: ${MYSQL_URL}
+    # username: ${MYSQL_USERNAME}
+    # password: ${MYSQL_PASSWORD}
+  # SQLite配置
   sqlite:
     db:
       path: ${SQLITE_DB_PATH:./data/qa.db} # SQLite数据库文件路径

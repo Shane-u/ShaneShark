@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/Style-TailwindCSS-38bdf8.svg" alt="TailwindCSS" />
   <img src="https://img.shields.io/badge/State-Zustand-8b5cf6.svg" alt="Zustand" />
   <img src="https://img.shields.io/badge/Backend-Spring%20Boot%203-orange.svg" alt="Spring Boot 3" />
-  <img src="https://img.shields.io/badge/DB-MySQL-blue.svg" alt="MySQL" />
+  <img src="https://img.shields.io/badge/DB-SQLite-blue.svg" alt="SQLite" />
 
 </div>
 
@@ -50,7 +50,7 @@
 | 前端     | React 18、TypeScript、Vite、TailwindCSS、Zustand | 单页应用 + 状态管理        |
 | 动效     | 动画库（如 GSAP、Magic UI 等）            | 页面转场与组件动画        |
 | 后端     | Spring Boot 3、Maven                     | REST API 服务            |
-| 数据库   | MySQL                                    | 主业务与 QA 模块数据存储  |
+| 数据库   | SQLite                                   | 主业务与 QA 模块数据存储（文件数据库）  |
 | CI / 构建 | GitHub Actions                          | 自动构建与基础检查        |
 
 ---
@@ -104,17 +104,19 @@ npm run build
 
 - JDK 17+
 - Maven
-- MySQL 数据库（版本 8.x 或兼容版本）
+- SQLite（无需单独安装，Java 应用已包含 SQLite JDBC 驱动）
 
 **准备数据库：**
 
-- 在 MySQL 中创建对应数据库
-- 执行 `backend/sql/` 目录下的建表脚本（包含 QA 模块表结构）
+- SQLite 数据库文件位于 `backend/data/qa.db`
+- 应用启动时会自动检查并创建表结构（如果表不存在）
+- 也可以手动执行 `backend/sql/create_qa_table.sql` 创建表结构
 
 **配置应用：**
 
-- 在 `backend` 中配置自己的数据库连接与基础配置（例如 `application.yml` 或 `.env`）
-- 注意不要将真实账号、密码等敏感信息提交到代码仓库
+- 在 `backend` 中配置基础配置（例如 `application.yml` 或 `.env`）
+- SQLite 数据库路径可通过环境变量 `SQLITE_DB_PATH` 配置，默认为 `./data/qa.db`
+- 注意：项目已禁用 MySQL，所有数据存储在 SQLite 文件中
 
 **本地运行：**
 
@@ -150,7 +152,7 @@ mvn -B -ntp clean package
   - QA 详情页：`/#/qa/{id}`
   - QA 编辑页：`/#/qa/edit/{id}` 或 `/#/qa/edit/new`
 
-QA 数据默认存储在后端数据库的 `qa_info` 表中，建表 SQL 位于 `backend/sql` 目录，字段与索引结构可直接参考对应 SQL 文件。
+QA 数据存储在 SQLite 数据库文件 `backend/data/qa.db` 的 `qa_info` 表中，建表 SQL 位于 `backend/sql` 目录，字段与索引结构可直接参考对应 SQL 文件。应用启动时会自动检查并创建表结构。
 
 ---
 

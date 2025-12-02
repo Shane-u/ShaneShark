@@ -3,6 +3,7 @@ package com.shaneShark.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
@@ -10,8 +11,7 @@ import java.io.File;
 
 /**
  * SQLite数据源配置
- * 注意：当前项目使用MySQL作为主数据源，如需使用SQLite，需要配置多数据源
- * 这里提供一个SQLite配置示例，实际使用时需要根据项目结构调整
+ * 项目使用SQLite作为主数据源，所有模块（包括QA）都使用SQLite
  */
 @Configuration
 public class SqliteConfig {
@@ -20,10 +20,11 @@ public class SqliteConfig {
     private String sqliteDbPath;
 
     /**
-     * SQLite数据源（可选配置）
-     * 如需使用，需要配置多数据源并指定QA模块使用此数据源
+     * SQLite数据源（主数据源）
+     * 确保数据库文件目录存在，如果数据库文件不存在会自动创建
      */
-    @Bean(name = "sqliteDataSource")
+    @Bean
+    @Primary
     public DataSource sqliteDataSource() {
         // 确保数据库文件目录存在
         File dbFile = new File(sqliteDbPath);

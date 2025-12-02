@@ -96,6 +96,7 @@ jobs:
             exit 1
           }
           echo "文件传输成功"
+          echo "注意: SQLite 数据库文件不会上传，应用启动时会自动在服务器上创建并初始化数据库"
 
       - name: 远程部署应用
         env:
@@ -111,6 +112,11 @@ jobs:
             
             # 确保部署目录存在
             mkdir -p "$DEPLOY_PATH"
+            
+            # 确保 data 目录存在（SQLite 数据库目录）
+            # 注意：数据库文件不会从本地上传，应用启动时会自动创建数据库文件和表结构
+            # 数据库文件会在服务器上持久化，每次部署不会覆盖已有数据
+            mkdir -p "$DEPLOY_PATH/data"
             
             # 停止旧进程（如果存在）
             if systemctl is-active --quiet "$APP_NAME" 2>/dev/null; then
