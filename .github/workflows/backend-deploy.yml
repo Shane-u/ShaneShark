@@ -61,15 +61,41 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: 加入服务器指纹
-        run: ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          echo "服务器指纹已添加"
         shell: bash
+
+      - name: 测试 SSH 连接
+        env:
+          SSH_TARGET: ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}
+        run: |
+          echo "测试 SSH 连接..."
+          ssh -v -o StrictHostKeyChecking=no -o ConnectTimeout=10 "$SSH_TARGET" "echo 'SSH 连接成功' && whoami && pwd" || {
+            echo "SSH 连接失败，请检查："
+            echo "1. SSH_PRIVATE_KEY secret 是否正确配置（需要包含完整的私钥，包括 -----BEGIN 和 -----END 行）"
+            echo "2. 服务器上的 ~/.ssh/authorized_keys 是否包含对应的公钥"
+            echo "3. 服务器用户是否有正确的权限"
+            echo "4. 服务器防火墙是否允许 SSH 连接"
+            exit 1
+          }
 
       - name: 传输 JAR 文件到服务器
         env:
           SSH_TARGET: ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}
         run: |
+          echo "开始传输 JAR 文件..."
+          echo "源文件: target/${{ env.JAR_NAME }}"
+          echo "目标: $SSH_TARGET:${{ env.DEPLOY_PATH }}/app.jar"
           # 由于 working-directory 是 backend，所以路径是 target/xxx.jar
-          scp target/${{ env.JAR_NAME }} "$SSH_TARGET:${{ env.DEPLOY_PATH }}/app.jar"
+          scp -v -o StrictHostKeyChecking=no target/${{ env.JAR_NAME }} "$SSH_TARGET:${{ env.DEPLOY_PATH }}/app.jar" || {
+            echo "文件传输失败"
+            exit 1
+          }
+          echo "文件传输成功"
 
       - name: 远程部署应用
         env:
