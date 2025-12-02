@@ -121,8 +121,14 @@ public class QaAdminController {
             // 仅管理员账号才打 QA 管理员会话标记
             request.getSession().setAttribute(QaAdminAuthService.QA_ADMIN_SESSION_KEY, Boolean.TRUE);
         } else {
-            // 确保普通账号不会继承上一位管理员的会话
-            request.getSession().removeAttribute(QaAdminAuthService.QA_ADMIN_SESSION_KEY);
+            // 普通用户：如果当前 session 已经有管理员权限（可能是通过口令登录设置的），保留它
+            // 这样两种登录方式可以独立工作，不会互相覆盖
+            Object existingAdminFlag = request.getSession().getAttribute(QaAdminAuthService.QA_ADMIN_SESSION_KEY);
+            if (existingAdminFlag == null || !(existingAdminFlag instanceof Boolean) || !((Boolean) existingAdminFlag)) {
+                // 只有当 session 中没有有效的管理员权限时，才移除（防止继承上一位管理员的会话）
+                request.getSession().removeAttribute(QaAdminAuthService.QA_ADMIN_SESSION_KEY);
+            }
+            // 如果已经有管理员权限（通过口令登录设置），就保留它，不做任何操作
         }
         return ResultUtils.success(true);
     }

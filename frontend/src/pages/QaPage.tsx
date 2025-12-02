@@ -213,6 +213,19 @@ export default function QaPage() {
     void syncAdminSession()
   }, [syncAdminSession])
 
+  // 监听窗口焦点事件，当窗口获得焦点时重新检查管理员状态
+  // 这样当用户通过 LoginWidget 登录后返回页面时，能自动更新状态
+  useEffect(() => {
+    const handleFocus = () => {
+      void syncAdminSession()
+    }
+    
+    window.addEventListener('focus', handleFocus)
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [syncAdminSession])
+
   const handleAdminEntry = async () => {
     if (isAdmin) {
       message.info('已处于管理员模式，卡片操作按钮已解锁')
