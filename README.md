@@ -145,7 +145,7 @@ mvn -B -ntp clean package
   - 标签筛选与分类浏览
   - 每日推荐 / 精选展示区块
   - 后台管理（新增 / 编辑 / 删除 QA）
-  - 基于语雀 Lake 文档格式 `text/lake` 的富文本编辑与阅读
+  - 基于语雀 Lake 文档格式 `text/lake` 的富文本编辑与阅读，前端通过 `public/vendor` 中的 `lakex`/`antd`/`react` 静态资源懒加载阅读器，请在部署静态资源时保留 `vendor/` 目录以确保 `/qa/detail` 独立预览页可正常渲染
 
 - **典型访问路径（示例）：**
   - QA 列表页：`/#/qa`
@@ -161,10 +161,28 @@ QA 数据存储在 SQLite 数据库文件 `backend/data/qa.db` 的 `qa_info` 表
 仓库内包含 GitHub Actions 配置，用于：
 
 - **前端自动部署**：推送到 `main/master` 分支时自动构建并部署到 GitHub Pages
+- **前端服务器部署**：推送到 `main/master` 分支时自动构建并将静态资源发布到 `154.201.70.202`（`frontend-deploy-server.yml`）
 - **后端自动部署**：推送到 `main/master` 分支时自动构建并部署到服务器
 - 详细的部署说明请参考：[部署文档](./docs/DEPLOYMENT.md)
 
 > 与服务器、密钥、口令相关的配置，**建议使用 GitHub Secrets 或其他安全方式管理**，不要写入 README 或提交到代码库中。
+
+### 前端服务器部署（154.201.70.202）
+
+- Workflow：`.github/workflows/frontend-deploy-server.yml`
+- 触发方式：推送 `frontend/**` 或手动 `workflow_dispatch`
+- 默认部署目录：`/var/www/shaneshark_frontend`（`html/` 子目录作为 Nginx 根目录）
+- 需要配置的 Secrets：
+  - `FRONTEND_SERVER_USER`：SSH 登录用户名（建议为具备部署权限的非 root 用户）
+  - `FRONTEND_SSH_PRIVATE_KEY`：对应用户的私钥（OpenSSH PEM 格式）
+  - `FRONTEND_API_BASE_URL`：生产环境 API 地址（会作为 `VITE_API_BASE_URL` 注入构建）
+- 运行流程：
+  1. 构建 `frontend` 并生成 `dist`
+  2. 将构建产物打包为 `shaneshark-frontend-dist.tar.gz`
+  3. 通过 SSH 将压缩包上传到 `154.201.70.202:/tmp`
+  4. 在服务器 `/var/www/shaneshark_frontend` 下解压至 `releases/<timestamp>` 并更新 `current`、`html` 目录
+  5. 尝试自动 `reload` Nginx（若服务器存在 `systemctl nginx`）
+- 如果服务器未安装 `rsync`，脚本会自动 fallback 为 `cp -R`，无需额外手动操作。
 
 ---
 

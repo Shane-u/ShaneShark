@@ -1,0 +1,114 @@
+name: Deploy Frontend to Edge Server
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-deploy-server.yml'
+  workflow_dispatch:
+
+env:
+  FRONTEND_SERVER_HOST: 154.201.70.202
+  FRONTEND_DEPLOY_PATH: /var/www/shaneshark_frontend
+  DIST_DIR: dist
+  ARCHIVE_NAME: shaneshark-frontend-dist.tar.gz
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建生产包
+        env:
+          VITE_API_BASE_URL: ${{ secrets.FRONTEND_API_BASE_URL }}
+        run: npm run build
+
+      - name: 压缩构建产物
+        run: |
+          if [ ! -d "${{ env.DIST_DIR }}" ]; then
+            echo "未找到构建目录 ${{ env.DIST_DIR }}"
+            exit 1
+          fi
+          tar -czf "../${{ env.ARCHIVE_NAME }}" -C "${{ env.DIST_DIR }}" .
+
+      - name: 配置 SSH 私钥
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.FRONTEND_SSH_PRIVATE_KEY }}
+
+      - name: 加入服务器指纹
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H "${{ env.FRONTEND_SERVER_HOST }}" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: 上传构建产物到服务器
+        env:
+          SSH_TARGET: ${{ secrets.FRONTEND_SERVER_USER }}@${{ env.FRONTEND_SERVER_HOST }}
+        run: |
+          scp "../${{ env.ARCHIVE_NAME }}" "$SSH_TARGET:/tmp/${{ env.ARCHIVE_NAME }}"
+
+      - name: 远程部署静态资源
+        env:
+          SSH_TARGET: ${{ secrets.FRONTEND_SERVER_USER }}@${{ env.FRONTEND_SERVER_HOST }}
+        run: |
+          ssh "$SSH_TARGET" bash -s <<'REMOTE_SCRIPT'
+            set -euo pipefail
+            ARCHIVE="/tmp/${{ env.ARCHIVE_NAME }}"
+            DEPLOY_PATH="${{ env.FRONTEND_DEPLOY_PATH }}"
+            RELEASE_DIR="$DEPLOY_PATH/releases"
+            CURRENT_DIR="$DEPLOY_PATH/current"
+
+            mkdir -p "$RELEASE_DIR"
+            mkdir -p "$DEPLOY_PATH/logs"
+
+            if [ ! -f "$ARCHIVE" ]; then
+              echo "未找到上传的压缩包: $ARCHIVE"
+              exit 1
+            fi
+
+            TIMESTAMP=$(date +%Y%m%d%H%M%S)
+            TARGET_DIR="$RELEASE_DIR/$TIMESTAMP"
+            mkdir -p "$TARGET_DIR"
+
+            tar -xzf "$ARCHIVE" -C "$TARGET_DIR"
+            rm -f "$ARCHIVE"
+
+            ln -sfn "$TARGET_DIR" "$CURRENT_DIR"
+
+            mkdir -p "$DEPLOY_PATH/html"
+            if command -v rsync >/dev/null 2>&1; then
+              rsync -a --delete "$CURRENT_DIR"/ "$DEPLOY_PATH/html"/
+            else
+              rm -rf "$DEPLOY_PATH/html"/*
+              cp -R "$CURRENT_DIR"/. "$DEPLOY_PATH/html"/
+            fi
+
+            if command -v systemctl >/dev/null 2>&1; then
+              sudo systemctl reload nginx || sudo systemctl restart nginx || true
+            fi
+
+            echo "部署完成，当前版本：$TIMESTAMP"
+          REMOTE_SCRIPT
+
+      - name: 清理本地压缩包
+        run: rm -f "../${{ env.ARCHIVE_NAME }}"
+

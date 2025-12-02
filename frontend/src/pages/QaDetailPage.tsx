@@ -29,6 +29,12 @@ declare global {
 }
 
 const EMPTY_LAKE_DOC = '{"ops":[{"insert":"\\n"}]}'
+const resolvePublicAsset = (relativePath: string) => {
+  const base = import.meta.env.BASE_URL ?? '/'
+  const normalizedBase = base.endsWith('/') ? base : `${base}/`
+  const normalizedPath = relativePath.replace(/^\//, '')
+  return `${normalizedBase}${normalizedPath}`
+}
 
 export default function QaDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -113,24 +119,26 @@ export default function QaDetailPage() {
 
         const cssLink = document.createElement('link')
         cssLink.rel = 'stylesheet'
-        cssLink.href = '/vendor/lakex/doc.css'
+        cssLink.href = resolvePublicAsset('vendor/lakex/doc.css')
         document.head.appendChild(cssLink)
 
         const antdCssLink = document.createElement('link')
         antdCssLink.rel = 'stylesheet'
-        antdCssLink.href = '/vendor/antd-4.24.13.css'
+        antdCssLink.href = resolvePublicAsset('vendor/antd-4.24.13.css')
         document.head.appendChild(antdCssLink)
 
         const reactScript = document.createElement('script')
-        reactScript.src = '/vendor/react.production.min.js'
+        reactScript.src = resolvePublicAsset('vendor/react.production.min.js')
         reactScript.crossOrigin = 'anonymous'
         reactScript.onload = () => {
           const reactDomScript = document.createElement('script')
-          reactDomScript.src = '/vendor/react-dom.production.min.js'
+          reactDomScript.src = resolvePublicAsset(
+            'vendor/react-dom.production.min.js'
+          )
           reactDomScript.crossOrigin = 'anonymous'
           reactDomScript.onload = () => {
             const docScript = document.createElement('script')
-            docScript.src = '/vendor/lakex/doc.umd.js'
+            docScript.src = resolvePublicAsset('vendor/lakex/doc.umd.js')
             docScript.onload = () => resolve()
             docScript.onerror = () => reject(new Error('加载语雀阅读器失败'))
             document.body.appendChild(docScript)
