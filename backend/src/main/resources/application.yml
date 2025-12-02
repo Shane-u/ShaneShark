@@ -82,6 +82,13 @@ server:
     session:
       cookie:
         max-age: 2592000
+        # 跨域必需配置：允许跨站Cookie传递
+        # SameSite=None 允许跨站请求携带Cookie（必需配合Secure使用）
+        # 注意：如果使用HTTP（非HTTPS），需要将secure设为false，但浏览器可能仍会阻止
+        # 生产环境建议使用HTTPS，并设置secure=true
+        same-site: ${SESSION_COOKIE_SAME_SITE:none}  # None/Lax/Strict，默认None允许跨域
+        secure: ${SESSION_COOKIE_SECURE:true}       # true=仅HTTPS，false=允许HTTP（开发环境）
+        http-only: true  # 防止XSS攻击，JavaScript无法访问
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false

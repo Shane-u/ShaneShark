@@ -22,7 +22,12 @@ function ensureSuccess<T>(result: ApiResponse<T>, defaultMessage: string): T {
 }
 
 async function request<T>(input: RequestInfo | URL, init?: RequestInit, defaultMessage = '请求失败'): Promise<T> {
-  const response = await fetch(input, init)
+  // 确保所有请求都携带Cookie（用于Session认证）
+  const requestInit: RequestInit = {
+    ...init,
+    credentials: 'include', // 跨域请求必须携带Cookie
+  }
+  const response = await fetch(input, requestInit)
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }

@@ -126,7 +126,7 @@ public class QaAdminController {
             Object existingAdminFlag = request.getSession().getAttribute(QaAdminAuthService.QA_ADMIN_SESSION_KEY);
             if (existingAdminFlag == null || !(existingAdminFlag instanceof Boolean) || !((Boolean) existingAdminFlag)) {
                 // 只有当 session 中没有有效的管理员权限时，才移除（防止继承上一位管理员的会话）
-                request.getSession().removeAttribute(QaAdminAuthService.QA_ADMIN_SESSION_KEY);
+            request.getSession().removeAttribute(QaAdminAuthService.QA_ADMIN_SESSION_KEY);
             }
             // 如果已经有管理员权限（通过口令登录设置），就保留它，不做任何操作
         }
