@@ -26,15 +26,17 @@ spring:
     # 30 天过期
     timeout: 2592000
   # 数据库配置 - 使用SQLite作为主数据源
+  # 注意：实际数据源由 SqliteConfig 配置类管理，这里仅保留配置项
   datasource:
     driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite:${SQLITE_DB_PATH:./data/qa.db}
     # MySQL配置已禁用，项目使用SQLite
     # driver-class-name: com.mysql.cj.jdbc.Driver
     # url: ${MYSQL_URL}
     # username: ${MYSQL_USERNAME}
     # password: ${MYSQL_PASSWORD}
   # SQLite配置
+  # 优先从环境变量 SQLITE_DB_PATH 读取，如果未设置则使用默认值 ./data/qa.db
+  # 服务器部署时，环境变量从 /root/envFiles/.env 文件加载（通过 systemd 的 EnvironmentFile）
   sqlite:
     db:
       path: ${SQLITE_DB_PATH:./data/qa.db} # SQLite数据库文件路径
