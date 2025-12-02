@@ -38,6 +38,8 @@ jobs:
       - name: 构建生产包
         env:
           VITE_API_BASE_URL: ${{ secrets.FRONTEND_API_BASE_URL }}
+          # 明确指定服务器部署的 base 为根路径 /
+          VITE_BASE_URL: /
         run: npm run build
 
       - name: 压缩构建产物

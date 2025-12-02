@@ -10,7 +10,9 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
-  base: process.env.GITHUB_ACTIONS ? '/ShaneShark/' : '/',
+  base: process.env.VITE_BASE_URL
+    ? process.env.VITE_BASE_URL
+    : (process.env.GITHUB_ACTIONS ? '/ShaneShark/' : '/'),
   server: {
     host: '0.0.0.0',
     port: 5173,
