@@ -1,17 +1,4 @@
-.qa-detail-page {
-  min-height: 100vh;
-  padding: 24px;
-  background: var(--bg-color, #f5f5f5);
-}
-
-.qa-detail-container {
-  max-width: 900px;
-  margin: 0 auto;
-  background: white;
-  padding: 32px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+/* QaDetailPage 样式 - 与 QaPage 保持一致的设计风格 */
 
 .qa-detail-loading {
   display: flex;
@@ -20,96 +7,113 @@
   min-height: 100vh;
 }
 
-.qa-detail-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.qa-detail-tag {
-  display: inline-block;
-  padding: 6px 16px;
-  background: #e6f7ff;
-  color: #1890ff;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.qa-detail-question {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: #262626;
-  line-height: 1.5;
-}
-
-.qa-detail-meta {
-  display: flex;
-  gap: 24px;
-  margin-bottom: 32px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 14px;
-  color: #8c8c8c;
-}
-
-.qa-detail-content {
-  margin-top: 32px;
-}
-
+/* 语雀阅读器容器 */
 .ne-doc-major-viewer {
   min-height: 400px;
+  width: 100%;
 }
 
-.qa-detail-error-banner {
-  margin-top: 16px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: rgba(248, 113, 113, 0.15);
-  color: #dc2626;
-  border: 1px solid rgba(248, 113, 113, 0.35);
-  font-size: 14px;
-}
-
-/* 夜间模式适配：统一改成浅色文字 + 深色背景，避免黑底黑字 */
-html.dark .qa-detail-page {
-  background: radial-gradient(circle at top, #020617 0%, #020617 55%, #020617 100%);
-}
-
-html.dark .qa-detail-container {
-  background: #020617;
-  color: #e5e7eb;
-  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.4);
-}
-
-html.dark .qa-detail-question {
-  color: #f9fafb !important;
-}
-
-html.dark .qa-detail-meta {
-  border-bottom-color: rgba(51, 65, 85, 0.9);
-  color: #9ca3af !important;
-}
-
-/* 夜间模式下为语雀阅读器提供默认浅色文字，交由文档自身决定高亮颜色 */
+/* 夜间模式适配：为语雀阅读器提供默认浅色文字 */
 html.dark .ne-doc-major-viewer .ne-viewer .ne-viewer-body {
   color: #e5e7eb;
 }
 
-/* 响应式 */
+/* 动画元素 */
+.detail-animate {
+  will-change: transform, opacity;
+}
+
+/* 响应式设计 */
 @media (max-width: 768px) {
-  .qa-detail-page {
-    padding: 16px;
-  }
-
-  .qa-detail-container {
-    padding: 20px;
-  }
-
-  .qa-detail-question {
-    font-size: 20px;
+  .ne-doc-major-viewer {
+    min-height: 300px;
   }
 }
 
+/* 滚动条美化 */
+::-webkit-scrollbar { 
+  width: 8px; 
+}
+
+::-webkit-scrollbar-track { 
+  background: transparent; 
+}
+
+::-webkit-scrollbar-thumb { 
+  background: #cbd5e1; 
+  border-radius: 4px; 
+}
+
+::-webkit-scrollbar-thumb:hover { 
+  background: #94a3b8; 
+}
+
+.bg-slate-950 ::-webkit-scrollbar-thumb { 
+  background: #334155; 
+}
+
+.bg-slate-950 ::-webkit-scrollbar-thumb:hover { 
+  background: #475569; 
+}
+
+/* 按钮悬停效果增强 */
+.ant-btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-btn:hover {
+  transform: translateY(-1px) !important;
+}
+
+.ant-btn:active {
+  transform: translateY(0) !important;
+}
+
+/* 确保 Ant Design 按钮样式不冲突 */
+.ant-btn-primary {
+  box-shadow: none !important;
+}
+
+.ant-btn:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* 语雀阅读器内容区域样式优化 */
+.ne-doc-major-viewer .ne-viewer {
+  padding: 0 !important;
+}
+
+.ne-doc-major-viewer .ne-viewer-body {
+  padding: 0 !important;
+  line-height: 1.8 !important;
+}
+
+/* 暗黑模式下语雀阅读器的代码块样式 */
+html.dark .ne-doc-major-viewer .ne-viewer code {
+  background: rgba(15, 23, 42, 0.7) !important;
+  color: #e5e7eb !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+}
+
+html.dark .ne-doc-major-viewer .ne-viewer pre {
+  background: #020617 !important;
+  color: #e5e7eb !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+}
+
+/* 明亮模式下语雀阅读器的代码块样式 */
+.ne-doc-major-viewer .ne-viewer code {
+  background: rgba(15, 23, 42, 0.08) !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+}
+
+.ne-doc-major-viewer .ne-viewer pre {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+}

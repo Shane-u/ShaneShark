@@ -134,4 +134,138 @@ html.dark .qa-typography tr:nth-child(even) {
   background: rgba(15, 23, 42, 0.02);
 }
 
+/* 稳定按钮样式 - 确保在所有状态下保持一致 */
+.qa-action-btn {
+  height: 48px !important;
+  padding: 0 24px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+}
+
+/* 打开独立页面按钮 - 浅色模式 */
+.qa-action-btn-open.qa-action-btn-light {
+  background: rgb(255, 255, 255) !important;
+  border: 1px solid rgb(226, 232, 240) !important;
+  color: rgb(51, 65, 85) !important;
+}
+
+.qa-action-btn-open.qa-action-btn-light:hover,
+.qa-action-btn-open.qa-action-btn-light:focus {
+  background: rgb(255, 255, 255) !important;
+  border-color: rgb(99, 102, 241) !important;
+  color: rgb(99, 102, 241) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.qa-action-btn-open.qa-action-btn-light:active {
+  background: rgb(249, 250, 251) !important;
+  transform: translateY(0) !important;
+}
+
+/* 打开独立页面按钮 - 深色模式 */
+.qa-action-btn-open.qa-action-btn-dark {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+.qa-action-btn-open.qa-action-btn-dark:hover,
+.qa-action-btn-open.qa-action-btn-dark:focus {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: rgb(255, 255, 255) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+}
+
+.qa-action-btn-open.qa-action-btn-dark:active {
+  background: rgba(255, 255, 255, 0.08) !important;
+  transform: translateY(0) !important;
+}
+
+/* 编辑文档按钮 - 统一样式 */
+.qa-action-btn-edit {
+  background: rgb(99, 102, 241) !important;
+  border: none !important;
+  color: rgb(255, 255, 255) !important;
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2), 0 4px 6px -2px rgba(99, 102, 241, 0.1) !important;
+}
+
+.qa-action-btn-edit:hover,
+.qa-action-btn-edit:focus {
+  background: rgb(79, 70, 229) !important;
+  border: none !important;
+  color: rgb(255, 255, 255) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.3), 0 10px 10px -5px rgba(99, 102, 241, 0.15) !important;
+}
+
+.qa-action-btn-edit:active {
+  background: rgb(67, 56, 202) !important;
+  transform: translateY(0) !important;
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2), 0 4px 6px -2px rgba(99, 102, 241, 0.1) !important;
+}
+
+/* 覆盖 Ant Design 默认样式 */
+.qa-action-btn.ant-btn,
+.qa-action-btn.ant-btn-default,
+.qa-action-btn.ant-btn-primary {
+  box-shadow: none !important;
+}
+
+.qa-action-btn.ant-btn:focus {
+  box-shadow: none !important;
+}
+
+/* 确保标签按钮默认可见（GSAP 动画会覆盖，但如果动画失败，这个规则会生效） */
+.tag-btn {
+  /* 使用 will-change 优化动画性能 */
+  will-change: transform, opacity;
+}
+
+/* 如果动画未执行或失败，确保元素在 2 秒后可见 */
+@keyframes tag-btn-fallback {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 为标签按钮添加 fallback 动画（延迟执行，如果 GSAP 动画正常，这个不会生效） */
+.tag-btn {
+  animation: tag-btn-fallback 0.1s ease-out 2s forwards;
+}
+
+/* 卡片底部操作按钮 - 暗色模式适配 */
+.bg-slate-950 .ant-btn-text,
+.bg-slate-950 .ant-btn-text:hover,
+.bg-slate-950 .ant-btn-text:focus {
+  color: inherit !important;
+}
+
+/* 确保按钮图标在暗色模式下可见 */
+.bg-slate-950 .ant-btn-text .anticon {
+  opacity: 1 !important;
+}
+
+/* 暗色模式下按钮悬停效果增强 */
+.bg-slate-950 .qa-card-item .ant-btn-text:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 6px !important;
+}
+
+/* 浅色模式下按钮悬停效果 */
+.bg-slate-50 .qa-card-item .ant-btn-text:hover {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+  border-radius: 6px !important;
+}
+
 

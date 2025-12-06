@@ -12,13 +12,50 @@ interface ApiResponse<T> {
   code: number
   data: T
   msg?: string
+  message?: string  // 后端可能返回 message 字段
 }
 
 function ensureSuccess<T>(result: ApiResponse<T>, defaultMessage: string): T {
   if (result && (result.code === 0 || result.code === 200)) {
     return result.data
   }
-  throw new Error(result?.msg || defaultMessage)
+  // 后端可能返回 msg 或 message 字段
+  const errorMsg = result?.msg || result?.message || defaultMessage
+  throw new Error(errorMsg)
+}
+
+// 递归处理对象，确保所有ID字段转换为字符串
+function normalizeIds<T>(data: T): T {
+  if (data === null || data === undefined) {
+    return data
+  }
+  if (Array.isArray(data)) {
+    return data.map(normalizeIds) as T
+  }
+  if (typeof data === 'object') {
+    const normalized = { ...data } as Record<string, unknown>
+    // 处理id字段：无论是number还是bigint，都转换为string
+    if ('id' in normalized) {
+      const idValue = normalized.id
+      if (typeof idValue === 'number' || typeof idValue === 'bigint') {
+        normalized.id = String(idValue)
+      } else if (idValue !== null && idValue !== undefined) {
+        // 如果已经是字符串或其他类型，确保是字符串
+        normalized.id = String(idValue)
+      }
+    }
+    // 处理嵌套对象和数组
+    for (const key in normalized) {
+      const value = normalized[key]
+      if (value !== null && value !== undefined) {
+        if (typeof value === 'object') {
+          normalized[key] = normalizeIds(value)
+        }
+      }
+    }
+    return normalized as T
+  }
+  return data
 }
 
 async function request<T>(input: RequestInfo | URL, init?: RequestInit, defaultMessage = '请求失败'): Promise<T> {
@@ -28,11 +65,34 @@ async function request<T>(input: RequestInfo | URL, init?: RequestInit, defaultM
     credentials: 'include', // 跨域请求必须携带Cookie
   }
   const response = await fetch(input, requestInit)
+  
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
+    let errorMessage = `HTTP error! status: ${response.status}`
+    try {
+      const errorData = await response.json()
+      if (errorData?.msg) {
+        errorMessage = errorData.msg
+      } else if (errorData?.message) {
+        errorMessage = errorData.message
+      }
+      console.error('API错误响应:', errorData)
+    } catch {
+      // 如果响应不是JSON，尝试读取文本
+      try {
+        const text = await response.text()
+        console.error('API错误响应(文本):', text)
+        if (text) errorMessage = text
+      } catch {
+        // 忽略
+      }
+    }
+    throw new Error(errorMessage)
   }
+  
   const result = (await response.json()) as ApiResponse<T>
-  return ensureSuccess(result, defaultMessage)
+  const data = ensureSuccess(result, defaultMessage)
+  // 确保ID字段转换为字符串，避免精度丢失
+  return normalizeIds(data)
 }
 
 /**
@@ -50,6 +110,14 @@ export async function getQaList(params: QaQueryParams): Promise<QaListResponse> 
     '获取QA列表失败'
   )
 
+  // 确保records数组中的每个item的ID都是字符串
+  if (data && data.records && Array.isArray(data.records)) {
+    data.records = data.records.map(qa => ({
+      ...qa,
+      id: String(qa.id || '')
+    }))
+  }
+
   return data || { records: [], total: 0, current: 1, size: 12 }
 }
 
@@ -57,7 +125,23 @@ export async function getQaList(params: QaQueryParams): Promise<QaListResponse> 
  * 获取QA详情
  */
 export async function getQaById(id: string): Promise<QaInfo> {
-  return request<QaInfo>(`${QA_BASE_URL}/${id}`, undefined, '获取QA详情失败')
+  // 确保ID是字符串，并清理可能的空格
+  const cleanId = String(id).trim()
+  if (!cleanId) {
+    throw new Error('ID不能为空')
+  }
+  // 验证ID格式（应该是数字字符串）
+  if (!/^\d+$/.test(cleanId)) {
+    throw new Error(`无效的ID格式: ${cleanId}`)
+  }
+  const url = `${QA_BASE_URL}/${cleanId}`
+  
+  const result = await request<QaInfo>(url, undefined, '获取QA详情失败')
+  // 确保返回的ID是字符串
+  if (result && result.id) {
+    result.id = String(result.id)
+  }
+  return result
 }
 
 export async function loginQaAdmin(password: string): Promise<boolean> {

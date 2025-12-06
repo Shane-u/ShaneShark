@@ -55,9 +55,47 @@ export function useSse<T = unknown>(
           receivedIdsRef.current.add(messageData.id)
         }
 
-        setData((prev) => [...prev, messageData.data ?? (raw as T)])
-        if (onMessage) {
-          onMessage(messageData.data ?? (raw as T))
+        // 确保ID字段转换为字符串，避免精度丢失
+        // 重要：在JSON.parse之前，大数字可能已经丢失精度
+        // 所以我们需要直接从原始字符串中提取ID
+        let processedData = messageData.data ?? (raw as T)
+        
+        if (processedData && typeof processedData === 'object' && 'id' in processedData) {
+          let idValue = processedData.id
+          
+          // 如果ID是数字且超过安全整数范围，尝试从原始JSON字符串恢复
+          if (typeof idValue === 'number' && idValue > Number.MAX_SAFE_INTEGER) {
+            try {
+              // 从原始event.data中提取完整的ID
+              const rawStr = typeof event.data === 'string' ? event.data : JSON.stringify(raw)
+              // 使用正则表达式提取ID，避免JSON.parse的精度丢失
+              const idMatch = rawStr.match(/"id"\s*:\s*(\d+)/)
+              if (idMatch && idMatch[1]) {
+                idValue = idMatch[1] // 保持为字符串
+              } else {
+                idValue = String(idValue)
+              }
+            } catch (e) {
+              idValue = String(idValue)
+            }
+          } else if (typeof idValue === 'number') {
+            idValue = String(idValue)
+          } else if (typeof idValue === 'bigint') {
+            idValue = String(idValue)
+          } else {
+            idValue = String(idValue || '')
+          }
+          
+          const dataWithStringId = { ...processedData, id: idValue } as T
+          setData((prev) => [...prev, dataWithStringId])
+          if (onMessage) {
+            onMessage(dataWithStringId)
+          }
+        } else {
+          setData((prev) => [...prev, processedData])
+          if (onMessage) {
+            onMessage(processedData)
+          }
         }
       } catch (err: unknown) {
         console.error('SSE消息解析失败:', err)

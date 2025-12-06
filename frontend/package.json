@@ -11,7 +11,10 @@
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.1.6",
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
     "@types/styled-components": "^5.1.36",
+    "@wavesurfer/react": "^1.0.12",
     "antd": "^4.24.13",
     "clsx": "^2.1.1",
     "gsap": "^3.13.0",
@@ -21,6 +24,8 @@
     "react-dom": "18.3.1",
     "react-router-dom": "^7.9.6",
     "styled-components": "^6.1.19",
+    "three": "^0.181.2",
+    "wavesurfer.js": "^7.12.1",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
