@@ -48,32 +48,22 @@ public class QaSseController {
                             .name("message")
                             .data("{\"type\":\"empty\",\"message\":\"暂无推荐内容\"}"));
                     emitter.complete();
-                    return;
-                }
+                } else {
+                    // 每次连接：随机选择 1 条精选 QA 推送
+                    Random random = new Random();
+                    QaInfo randomQa = hotQaList.get(random.nextInt(hotQaList.size()));
 
-                // 随机选择1-3条
-                Random random = new Random();
-                int count = Math.min(random.nextInt(3) + 1, hotQaList.size());
-                List<QaInfo> selectedQa = new java.util.ArrayList<>(hotQaList);
-                // 打乱顺序并取前count条
-                java.util.Collections.shuffle(selectedQa);
-                selectedQa = selectedQa.subList(0, count);
-
-                // 转换为VO并发送（默认每 3 秒推送一条，避免刷得太快）
-                for (QaInfo qaInfo : selectedQa) {
-                    QaVO qaVO = qaInfoService.getQaVO(qaInfo);
+                    QaVO qaVO = qaInfoService.getQaVO(randomQa);
                     if (qaVO != null) {
                         String jsonData = JSONUtil.toJsonStr(qaVO);
                         emitter.send(SseEmitter.event()
                                 .name("message")
                                 .data(jsonData));
-                        // 如果你想调节频率，可以改这里的毫秒数：
-                        // 1000 = 1秒一条，3000 = 3秒一条，5000 = 5秒一条
-                        Thread.sleep(5000); // 间隔 5000ms 发送
                     }
-                }
 
-                emitter.complete();
+                    // 发送完成后立即结束 SSE 连接
+                    emitter.complete();
+                }
             } catch (org.springframework.jdbc.BadSqlGrammarException e) {
                 // 数据库表不存在
                 log.error("SSE推送失败：数据库表可能不存在", e);
