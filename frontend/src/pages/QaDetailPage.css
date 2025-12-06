@@ -41,7 +41,7 @@ html.dark .ne-doc-major-viewer .ne-viewer .ne-viewer-body {
 
 ::-webkit-scrollbar-thumb { 
   background: #cbd5e1; 
-  border-radius: 4px; 
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover { 
@@ -109,11 +109,11 @@ html.dark .ne-doc-major-viewer .ne-viewer pre {
   background: rgba(15, 23, 42, 0.08) !important;
   padding: 2px 6px !important;
   border-radius: 4px !important;
-}
+  }
 
 .ne-doc-major-viewer .ne-viewer pre {
   background: #0f172a !important;
   color: #f8fafc !important;
   border-radius: 12px !important;
   padding: 16px !important;
-}
+  }

@@ -58,7 +58,7 @@ export function useSse<T = unknown>(
         // 确保ID字段转换为字符串，避免精度丢失
         // 重要：在JSON.parse之前，大数字可能已经丢失精度
         // 所以我们需要直接从原始字符串中提取ID
-        let processedData = messageData.data ?? (raw as T)
+        const processedData = messageData.data ?? (raw as T)
         
         if (processedData && typeof processedData === 'object' && 'id' in processedData) {
           let idValue = processedData.id
@@ -75,7 +75,7 @@ export function useSse<T = unknown>(
               } else {
                 idValue = String(idValue)
               }
-            } catch (e) {
+            } catch {
               idValue = String(idValue)
             }
           } else if (typeof idValue === 'number') {

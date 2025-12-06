@@ -37,21 +37,27 @@ const EMPTY_LAKE_DOC = '{"ops":[{"insert":"\\n"}]}'
 
 // 3D 粒子背景组件
 function ParticleField({ isDark }: { isDark: boolean }) {
-  const ref = useRef<any>()
+  // Three.js Points 组件的 ref 类型较复杂，使用 unknown 类型
+  const ref = useRef<unknown>(null)
   const [sphere] = useState(() => random.inSphere(new Float32Array(6000), { radius: 1.8 }))
   
   useFrame((state, delta) => {
     if(ref.current) {
-      ref.current.rotation.x -= delta / 15
-      ref.current.rotation.y -= delta / 20
+      const points = ref.current as {
+        rotation: { x: number; y: number }
+        scale: { set: (x: number, y: number, z: number) => void }
+      }
+      points.rotation.x -= delta / 15
+      points.rotation.y -= delta / 20
       const scale = 1 + Math.sin(state.clock.elapsedTime * 0.5) * 0.05
-      ref.current.scale.set(scale, scale, scale)
+      points.scale.set(scale, scale, scale)
     }
   })
 
   return (
     <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={sphere} stride={3} frustumCulled={false}>
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      <Points ref={ref as any} positions={sphere} stride={3} frustumCulled={false}>
         <PointMaterial
           transparent
           color={isDark ? "#8b5cf6" : "#3b82f6"}
@@ -358,7 +364,7 @@ export default function QaDetailPage() {
                   isDark ? 'prose-invert' : ''
                 }`} 
               />
-              {viewerError && (
+          {viewerError && (
                 <div className={`mt-6 p-4 rounded-lg border ${
                   isDark 
                     ? 'bg-red-500/10 border-red-500/30 text-red-400' 
@@ -367,7 +373,7 @@ export default function QaDetailPage() {
                   <div className="font-medium mb-1">内容渲染错误</div>
                   <div className="text-sm opacity-90">{viewerError}</div>
                 </div>
-              )}
+          )}
             </div>
           </div>
         </div>
