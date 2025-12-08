@@ -46,8 +46,8 @@ jobs:
           VITE_HF_PROXY_BASE_URL: ${{ secrets.VITE_HF_PROXY_BASE_URL }}
           # SiliconFlow 相关环境变量（可选，如果未设置则从服务器 /root/envFiles/.env 读取）
           # 注意：这些变量不会在 GitHub Actions 中设置，将在服务器本地构建时从 /root/envFiles/.env 读取
-          # SILICON_FLOW_API_KEY: ${{ secrets.SILICON_FLOW_API_KEY }}
-          # SILICON_FLOW_MODEL: ${{ secrets.SILICON_FLOW_MODEL }}
+          SILICON_FLOW_API_KEY: ${{ secrets.SILICON_FLOW_API_KEY }}
+          SILICON_FLOW_MODEL: ${{ secrets.SILICON_FLOW_MODEL }}
         run: npm run build
 
       - name: 压缩构建产物
