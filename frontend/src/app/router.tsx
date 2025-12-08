@@ -7,6 +7,7 @@ const FavoritesPage = lazy(() => import('@/pages/FavoritesPage'))
 const QaPage = lazy(() => import('@/pages/QaPage'))
 const QaDetailPage = lazy(() => import('@/pages/QaDetailPage'))
 const QaEditPage = lazy(() => import('@/pages/QaEditPage'))
+const ReviewCheckPage = lazy(() => import('@/pages/ReviewCheckPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
 // 支持的锚点路由
@@ -21,6 +22,7 @@ export const router = createHashRouter(
       <Route path="qa" element={<QaPage />} />
       <Route path="qa/:id" element={<QaDetailPage />} />
       <Route path="qa/edit/:id" element={<QaEditPage />} />
+      <Route path="review" element={<ReviewCheckPage />} />
       {/* 锚点路由直接渲染 HomePage，HomePage 会根据路径滚动到对应锚点 */}
       {anchorRoutes.map((anchor) => (
         <Route key={anchor} path={anchor} element={<HomePage />} />

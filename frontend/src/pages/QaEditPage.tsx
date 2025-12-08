@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { 
   useEffect, 
   useState, 
@@ -326,6 +327,7 @@ export default function QaEditPage() {
             setEditorError(null)
             setEditorLoading(false)
         } catch (e) {
+            console.error(e)
             setTimeout(loadContent, 1000)
         }
     }

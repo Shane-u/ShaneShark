@@ -115,8 +115,7 @@ export function LoginWidget() {
       </StyledButtonWrapper>
       <Modal
         title="登录以继续"
-        // 当前项目使用 antd v4，因此用 visible 控制显隐
-        visible={open}
+        open={open}
         onCancel={handleClose}
         footer={null}
         destroyOnClose

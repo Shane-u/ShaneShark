@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-empty */
 import { useState, useEffect, useRef, useLayoutEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Pagination, Button, Modal, Input, message, Empty, notification, Tooltip } from 'antd'
@@ -12,6 +15,7 @@ import {
   AppstoreOutlined
 } from '@ant-design/icons'
 import { useTheme } from '@/providers/ThemeProvider'
+import { Sparkles } from 'lucide-react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Points, PointMaterial, Float } from '@react-three/drei'
 import * as random from 'maath/random/dist/maath-random.esm'
@@ -112,6 +116,19 @@ const convertAnswerToHtml = (content: string) => {
   }
   if (trimmed.includes('<')) return trimmed
   return `<p>${trimmed.replace(/\n+/g, '<br />')}</p>`
+}
+
+// 提取纯文本，用于“检验复盘”预填，去掉 Lake/HTML 元信息
+const extractPlainText = (raw: string) => {
+  if (!raw) return ''
+  return raw
+    // 去掉 Lake/HTML 标签
+    .replace(/<[^>]+>/g, ' ')
+    // 解码常见实体
+    .replace(/&nbsp;/g, ' ')
+    // 收敛多余空白
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 // --- Visual Component: Three.js Particles ---
@@ -464,6 +481,13 @@ export default function QaPage() {
     return text.length <= 80 ? text : text.substring(0, 80) + '...'
   }
 
+  const handleQuickReview = (qa: QaInfo) => {
+    const topic = encodeURIComponent(qa.question)
+    const answerPlain = extractPlainText(qa.answer || '')
+    const answer = encodeURIComponent(answerPlain)
+    navigate(`/review?topic=${topic}&answer=${answer}`)
+  }
+
   const mergedTags = useMemo(() => {
     const all = new Set<string>([...QA_TAGS])
     const data = [...qaList, ...hotQaList]
@@ -676,6 +700,17 @@ export default function QaPage() {
                               : 'hover:bg-indigo-50 text-indigo-600'
                           }`}
                         />
+                        <Tooltip title="检验复盘">
+                          <Button
+                            type="primary"
+                            size="small"
+                            icon={<Sparkles size={16} />}
+                            onClick={(e) => { e.stopPropagation(); handleQuickReview(qa) }}
+                            className="!flex !items-center !gap-2 !px-3 !py-2 !h-auto rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 border-none shadow-lg shadow-indigo-200/40 text-white font-semibold tracking-tight hover:opacity-90 hover:scale-[1.02] transition-all"
+                          >
+                            检验复盘
+                          </Button>
+                        </Tooltip>
                         {isAdmin && (
                           <>
                             <Button 

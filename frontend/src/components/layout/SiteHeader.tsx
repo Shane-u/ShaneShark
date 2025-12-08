@@ -85,6 +85,12 @@ export function SiteHeader() {
             QA知识库
           </NavLink>
           <NavLink
+            to="/review"
+            className="rounded-full border border-indigo-200 px-4 py-2 text-xs uppercase tracking-wide transition hover:border-indigo-500 hover:text-indigo-600 !text-indigo-600 bg-indigo-50/70 dark:bg-slate-800 dark:border-indigo-500/40 dark:!text-indigo-200"
+          >
+            检验复盘
+          </NavLink>
+          <NavLink
             to="/favorites"
             className="rounded-full border border-slate-200 px-4 py-2 text-xs uppercase tracking-wide transition hover:border-accent hover:text-accent !text-slate-600 dark:border-slate-600 dark:!text-slate-100"
           >
