@@ -7,13 +7,15 @@ export interface ReviewResult {
   improvedAnswerSuggestion: string
 }
 
-export enum ReviewAppState {
-  IDLE = 'IDLE',
-  RECORDING = 'RECORDING',
-  PROCESSING = 'PROCESSING',
-  RESULTS = 'RESULTS',
-  ERROR = 'ERROR',
-}
+export const ReviewAppState = {
+  IDLE: 'IDLE',
+  RECORDING: 'RECORDING',
+  PROCESSING: 'PROCESSING',
+  RESULTS: 'RESULTS',
+  ERROR: 'ERROR',
+} as const
+
+export type ReviewAppState = (typeof ReviewAppState)[keyof typeof ReviewAppState]
 
 export interface UserInput {
   topic: string
