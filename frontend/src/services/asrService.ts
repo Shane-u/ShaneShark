@@ -24,7 +24,7 @@ export async function transcribeWithHuggingFace(audioBlob: Blob): Promise<ASRRes
   if (!HF_API_TOKEN) {
     return {
       text: '',
-      error: '缺少 VITE_HUGGINGFACE_API_TOKEN，请在 frontend/.env 或 /home/envFiles/.env 配置后重试（生产环境需在构建时注入）',
+      error: '缺少 VITE_HUGGINGFACE_API_TOKEN，请在 frontend/.env 或 /root/envFiles/.env 配置后重试（生产环境需在构建时注入）',
     }
   }
 
@@ -59,7 +59,7 @@ export async function transcribeWithHuggingFaceREST(audioBlob: Blob): Promise<AS
   if (!HF_API_TOKEN) {
     return {
       text: '',
-      error: '缺少 VITE_HUGGINGFACE_API_TOKEN，请在 frontend/.env 或 /home/envFiles/.env 配置后重试（生产环境需在构建时注入）',
+      error: '缺少 VITE_HUGGINGFACE_API_TOKEN，请在 frontend/.env 或 /root/envFiles/.env 配置后重试（生产环境需在构建时注入）',
     }
   }
 

@@ -7,21 +7,21 @@ export default defineConfig(({ mode }) => {
   // 加载项目本地环境变量（frontend/.env, frontend/.env.production 等）
   const projectEnv = loadEnv(mode, __dirname, '')
   
-  // 加载外部环境变量（/home/envFiles/.env, /home/envFiles/.env.production 等）
+  // 加载外部环境变量（/root/envFiles/.env, /root/envFiles/.env.production 等）
   // 第三个参数为空字符串表示读取所有变量（不限制 VITE_ 前缀）
   let externalEnv: Record<string, string> = {}
   try {
     // 先尝试读取 mode 特定的文件（如 .env.production），再读取通用 .env
-    const modeSpecificEnv = loadEnv(mode, '/home/envFiles', '')
-    const generalEnv = loadEnv('', '/home/envFiles', '') // 空 mode 读取 .env
+    const modeSpecificEnv = loadEnv(mode, '/root/envFiles', '')
+    const generalEnv = loadEnv('', '/root/envFiles', '') // 空 mode 读取 .env
     externalEnv = { ...generalEnv, ...modeSpecificEnv } // mode 特定文件优先级更高
   } catch (err) {
-    console.warn('无法加载 /home/envFiles 环境变量:', err)
+    console.warn('无法加载 /root/envFiles 环境变量:', err)
     // 如果失败，尝试只读取通用 .env
     try {
-      externalEnv = loadEnv('', '/home/envFiles', '')
+      externalEnv = loadEnv('', '/root/envFiles', '')
     } catch (fallbackErr) {
-      console.warn('无法加载 /home/envFiles/.env:', fallbackErr)
+      console.warn('无法加载 /root/envFiles/.env:', fallbackErr)
     }
   }
   
