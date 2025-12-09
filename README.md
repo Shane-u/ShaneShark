@@ -56,8 +56,6 @@
 
 ## 🖼️ 界面预览
 
-> 如果图片未显示，请确认 `docs/imgs` 目录与相对路径 `./docs/imgs/*.png` 是否存在。
-
 - 首页概览  
   ![首页](./docs/imgs/homepage.png)
 - QA 列表 / 详情  
